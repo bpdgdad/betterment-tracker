@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Yearly Life Betterment Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-elevated: #111827;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.12);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937, #020617 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .app-shell {
+      flex: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 16px 16px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .title-block {
+      display: flex;
+      flex-direction: column;
+    }
+    .title-block h1 {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .title-block span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .pill {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.9);
+    }
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.25);
+    }
+    main {
+      flex: 1;
+      padding: 0 12px 72px;
+    }
+    .tab-strip {
+      display: flex;
+      gap: 8px;
+      padding: 0 4px 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tab-strip::-webkit-scrollbar {
+      display: none;
+    }
+    .tab-chip {
+      white-space: nowrap;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .tab-chip.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--text-main);
+      font-weight: 600;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 18px;
+      border: 1px solid var(--border-subtle);
+      box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(148, 163, 184, 0.12) inset;
+      padding: 12px;
+      margin-top: 4px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .card-header h2 {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    .card-header span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .week-pill {
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      background: rgba(15, 23, 42, 0.9);
+    }
+    .week-pill strong {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+    .week-pill svg {
+      width: 14px;
+      height: 14px;
+      opacity: 0.6;
+    }
+    .table-wrapper {
+      margin-top: 4px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.1), rgba(15, 23, 42, 0.9));
+      overflow: auto;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+      min-width: 100%;
+    }
+    thead {
+      background: linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.7));
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    th, td {
+      padding: 6px 4px;
+      text-align: center;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+    }
+    th:first-child, td:first-child {
+      text-align: left;
+      padding-left: 10px;
+    }
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    tbody tr:nth-child(even) {
+      background: rgba(15, 23, 42, 0.8);
+    }
+    tbody tr:nth-child(odd) {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .category-label {
+      font-weight: 500;
+      font-size: 0.78rem;
+    }
+    .category-label span {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    input.day-input,
+    input.log-input,
+    select.log-input,
+    textarea.log-input {
+      width: 100%;
+      padding: 4px 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-main);
+      font-size: 0.72rem;
+    }
+    input.day-input {
+      max-width: 52px;
+      text-align: center;
+    }
+    input.day-input:focus,
+    input.log-input:focus,
+    select.log-input:focus,
+    textarea.log-input:focus {
+      outline: 1px solid var(--accent);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
+    }
+    textarea.log-input {
+      resize: vertical;
+      min-height: 48px;
+    }
+    .summary-cell {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent);
+      min-width: 48px;
+    }
+    .helper-text {
+      margin-top: 8px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .helper-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      margin-top: 4px;
+    }
+    .add-btn {
+      margin-top: 8px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: var(--accent-soft);
+      color: var(--text-main);
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .add-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+    .small-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.9);
+      margin-left: 4px;
+    }
+    .small-badge span {
+      color: var(--accent);
+    }
+    .row-controls {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 4px;
+      gap: 6px;
+      font-size: 0.7rem;
+    }
+    .clear-btn {
+      border-radius: 999px;
+      padding: 4px 8px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 6px 10px 10px;
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.9));
+      border-top: 1px solid rgba(31, 41, 55, 0.9);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      backdrop-filter: blur(20px);
+    }
+    .nav-btn {
+      flex: 1;
+      border-radius: 999px;
+      padding: 6px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+    }
+    .nav-btn span {
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .nav-btn svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.7;
+    }
+    .nav-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--text-main);
+    }
+    .nav-btn.active svg {
+      opacity: 1;
+    }
+    @media (min-width: 768px) {
+      header {
+        padding-top: 20px;
+      }
+      .card {
+        padding: 14px;
+      }
+      .card-header h2 {
+        font-size: 1.05rem;
+      }
+      table {
+        font-size: 0.8rem;
+      }
+      input.day-input {
+        max-width: 64px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="title-block">
+        <h1>Yearly Life Betterment</h1>
+        <span>2026 dashboard in your pocket</span>
+      </div>
+      <div class="pill">
+        <div class="pill-dot"></div>
+        <span>On your phone · Offline</span>
+      </div>
+    </header>
+
+    <main>
+      <div class="tab-strip" id="tabStrip">
+        <!-- Tabs injected here -->
+      </div>
+
+      <section id="screenContainer">
+        <!-- Active screen injected here -->
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <!-- Bottom nav buttons injected here -->
+  </nav>
+
+  <script>
+    const STORAGE_KEY = "bettermentTracker_v2";
+
+    const appConfig = {
+      tabs: [
+        {
+          id: "weekly",
+          label: "Weekly Tracker",
+          description: "Log core habits for the current week.",
+          icon: "grid",
+          type: "weeklyGrid"
+        },
+        {
+          id: "mammoth",
+          label: "Mammoth March",
+          description: "Training log: distance & pack weight.",
+          icon: "chart",
+          type: "mammothLog"
+        },
+        {
+          id: "discGolf",
+          label: "Disc Golf",
+          description: "Rounds & practice notes.",
+          icon: "check",
+          type: "discGolfLog"
+        },
+        {
+          id: "youtube",
+          label: "YouTube Tracker",
+          description: "Video ideas & status.",
+          icon: "play",
+          type: "youtubeLog"
+        }
+      ],
+      weekly: {
+        days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        rows: [
+          { id: "strength", label: "Strength", summaryLabel: "Strength Workouts Done" },
+          { id: "walk", label: "Walk", summaryLabel: "Walk Days Done" },
+          { id: "hike", label: "Hike (Long)", summaryLabel: "Total Miles" },
+          { id: "weight", label: "Weight" },
+          { id: "dg_practice", label: "DG Practice", summaryLabel: "Disc Golf Practice" },
+          { id: "dg_round", label: "DG Round/Tournament", summaryLabel: "Disc Golf Rounds" },
+          { id: "vets_local", label: "Vets Local" },
+          { id: "vets_national", label: "Vets National" },
+          { id: "guitar", label: "Guitar Practice" },
+          { id: "crisc", label: "CRISC Study" },
+          { id: "pmp", label: "PMP Study - Starts Q3" },
+          { id: "water", label: "Water" },
+          { id: "snacks", label: "Snacks" },
+          { id: "sleep", label: "Sleep" },
+          { id: "yt_plan", label: "YT Plan" },
+          { id: "yt_shoot", label: "YT Shoot" },
+          { id: "yt_edit", label: "YT Edit" },
+          { id: "yt_upload", label: "YT Upload" },
+          { id: "mental_reset", label: "Mental Reset" },
+          { id: "mm_distance", label: "MM Distance" },
+          { id: "mm_pack_weight", label: "MM Pack Weight" }
+        ]
+      }
+    };
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return {};
+        return JSON.parse(raw);
+      } catch (e) {
+        console.warn("Failed to parse saved data", e);
+        return {};
+      }
+    }
+
+    function saveState(state) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn("Failed to save", e);
+      }
+    }
+
+    function ensureDefaultState(state) {
+      if (!state.weekly) {
+        state.weekly = { weekLabel: "This Week", data: {} };
+      }
+      if (!state.mammoth) {
+        state.mammoth = { entries: [] };
+      }
+      if (!state.discGolf) {
+        state.discGolf = { entries: [] };
+      }
+      if (!state.youtube) {
+        state.youtube = { entries: [] };
+      }
+      return state;
+    }
+
+    let appState = ensureDefaultState(loadState());
+
+    function makeId() {
+      return "id_" + Math.random().toString(36).slice(2, 10);
+    }
+
+    function renderTabs(activeId) {
+      const strip = document.getElementById("tabStrip");
+      strip.innerHTML = "";
+      appConfig.tabs.forEach(tab => {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "tab-chip" + (tab.id === activeId ? " active" : "");
+        chip.textContent = tab.label;
+        chip.addEventListener("click", () => setActiveTab(tab.id));
+        strip.appendChild(chip);
+      });
+    }
+
+    function bottomIcon(name) {
+      if (name === "grid") {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="2"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="2"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="2"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="2"></rect>
+          </svg>
+        `;
+      }
+      if (name === "check") {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        `;
+      }
+      if (name === "chart") {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 19h16M7 16v-5M12 16V5M17 16v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        `;
+      }
+      if (name === "play") {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5v14l11-7z" fill="currentColor"></path>
+          </svg>
+        `;
+      }
+      return `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle>
+        </svg>
+      `;
+    }
+
+    function renderBottomNav(activeId) {
+      const nav = document.getElementById("bottomNav");
+      nav.innerHTML = "";
+      appConfig.tabs.forEach(tab => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "nav-btn" + (tab.id === activeId ? " active" : "");
+        btn.innerHTML = `
+          ${bottomIcon(tab.icon)}
+          <span>${tab.label}</span>
+        `;
+        btn.addEventListener("click", () => setActiveTab(tab.id));
+        nav.appendChild(btn);
+      });
+    }
+
+    function setActiveTab(tabId) {
+      appState.activeTab = tabId;
+      saveState(appState);
+      renderTabs(tabId);
+      renderBottomNav(tabId);
+      renderScreen(tabId);
+    }
+
+    function renderScreen(tabId) {
+      const container = document.getElementById("screenContainer");
+      const tab = appConfig.tabs.find(t => t.id === tabId) || appConfig.tabs[0];
+
+      if (tab.type === "weeklyGrid") {
+        container.innerHTML = "";
+        container.appendChild(renderWeeklyGridScreen());
+      } else if (tab.type === "mammothLog") {
+        container.innerHTML = "";
+        container.appendChild(renderMammothScreen());
+      } else if (tab.type === "discGolfLog") {
+        container.innerHTML = "";
+        container.appendChild(renderDiscGolfScreen());
+      } else if (tab.type === "youtubeLog") {
+        container.innerHTML = "";
+        container.appendChild(renderYouTubeScreen());
+      } else {
+        container.innerHTML = "<p style='padding:12px;font-size:0.85rem;color:var(--text-muted);'>Screen not implemented yet.</p>";
+      }
+    }
+
+    function renderWeeklyGridScreen() {
+      const section = document.createElement("section");
+      section.className = "card";
+
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <h2>Weekly Habit Grid</h2>
+          <span>One place to log 2026 progress for this week.</span>
+        </div>
+        <button type="button" class="week-pill" id="weekLabelBtn">
+          <span>Week:</span>
+          <strong>${appState.weekly.weekLabel || "This Week"}</strong>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 10l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </button>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+
+      const firstTh = document.createElement("th");
+      firstTh.textContent = "Category";
+      headRow.appendChild(firstTh);
+
+      appConfig.weekly.days.forEach(day => {
+        const th = document.createElement("th");
+        th.textContent = day;
+        headRow.appendChild(th);
+      });
+
+      const totalTh = document.createElement("th");
+      totalTh.textContent = "Weekly Total";
+      headRow.appendChild(totalTh);
+
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      appConfig.weekly.rows.forEach(row => {
+        const tr = document.createElement("tr");
+        const labelTd = document.createElement("td");
+        labelTd.className = "category-label";
+        labelTd.innerHTML = row.label + (row.summaryLabel ? `<span>${row.summaryLabel}</span>` : "");
+        tr.appendChild(labelTd);
+
+        let rowTotal = 0;
+
+        appConfig.weekly.days.forEach(day => {
+          const td = document.createElement("td");
+          const stored = (appState.weekly.data[row.id] && appState.weekly.data[row.id][day]) || "";
+          const input = document.createElement("input");
+          input.type = "number";
+          input.inputMode = "decimal";
+          input.min = "0";
+          input.step = "0.01";
+          input.className = "day-input";
+          input.value = stored;
+          if (stored !== "" && !isNaN(parseFloat(stored))) {
+            rowTotal += parseFloat(stored);
+          }
+          input.addEventListener("input", () => {
+            const value = input.value;
+            if (!appState.weekly.data[row.id]) {
+              appState.weekly.data[row.id] = {};
+            }
+            appState.weekly.data[row.id][day] = value;
+            saveState(appState);
+          });
+          td.appendChild(input);
+          tr.appendChild(td);
+        });
+
+        const totalTd = document.createElement("td");
+        totalTd.className = "summary-cell";
+        totalTd.textContent = rowTotal ? rowTotal.toFixed(2).replace(/\.00$/, "") : "–";
+        tr.appendChild(totalTd);
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const helper = document.createElement("div");
+      helper.className = "helper-text";
+      helper.innerHTML = `
+        <div class="helper-dot"></div>
+        <div>
+          Type numbers for each day (miles, workouts, minutes, reps &mdash; whatever fits the row).
+          Your entries stay on this device only, stored in your browser. Add this page to your Android home screen for quick access.
+        </div>
+      `;
+      section.appendChild(helper);
+
+      setTimeout(() => {
+        const weekBtn = document.getElementById("weekLabelBtn");
+        if (weekBtn) {
+          weekBtn.addEventListener("click", () => {
+            const current = appState.weekly.weekLabel || "This Week";
+            const next = prompt("Set a label for this week (e.g., 'Week 1 · Jan 1–7'):", current);
+            if (next !== null && next.trim() !== "") {
+              appState.weekly.weekLabel = next.trim();
+              saveState(appState);
+              renderScreen("weekly");
+            }
+          });
+        }
+      }, 0);
+
+      return section;
+    }
+
+    function renderMammothScreen() {
+      const section = document.createElement("section");
+      section.className = "card";
+
+      const header = document.createElement("div");
+      header.className = "card-header";
+      const totalDistance = (appState.mammoth.entries || []).reduce((sum, e) => {
+        const d = parseFloat(e.distance || "0");
+        return sum + (isNaN(d) ? 0 : d);
+      }, 0);
+      header.innerHTML = `
+        <div>
+          <h2>Mammoth March Training</h2>
+          <span>Log training hikes: distance, pack weight, and notes.</span>
+        </div>
+        <div class="small-badge">
+          <span>${totalDistance ? totalDistance.toFixed(1) : "0.0"}</span> mi logged
+        </div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th style="min-width:90px;">Date</th>
+          <th style="min-width:80px;">Distance (mi)</th>
+          <th style="min-width:80px;">Pack (lbs)</th>
+          <th style="min-width:120px;">Terrain / Notes</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      (appState.mammoth.entries || []).forEach((entry, idx) => {
+        const tr = document.createElement("tr");
+
+        const dateTd = document.createElement("td");
+        const dateInput = document.createElement("input");
+        dateInput.type = "date";
+        dateInput.className = "log-input";
+        dateInput.value = entry.date || "";
+        dateInput.addEventListener("input", () => {
+          appState.mammoth.entries[idx].date = dateInput.value;
+          saveState(appState);
+        });
+        dateTd.appendChild(dateInput);
+        tr.appendChild(dateTd);
+
+        const distTd = document.createElement("td");
+        const distInput = document.createElement("input");
+        distInput.type = "number";
+        distInput.inputMode = "decimal";
+        distInput.step = "0.1";
+        distInput.min = "0";
+        distInput.className = "log-input";
+        distInput.value = entry.distance || "";
+        distInput.addEventListener("input", () => {
+          appState.mammoth.entries[idx].distance = distInput.value;
+          saveState(appState);
+        });
+        distTd.appendChild(distInput);
+        tr.appendChild(distTd);
+
+        const packTd = document.createElement("td");
+        const packInput = document.createElement("input");
+        packInput.type = "number";
+        packInput.inputMode = "decimal";
+        packInput.step = "0.5";
+        packInput.min = "0";
+        packInput.className = "log-input";
+        packInput.value = entry.packWeight || "";
+        packInput.addEventListener("input", () => {
+          appState.mammoth.entries[idx].packWeight = packInput.value;
+          saveState(appState);
+        });
+        packTd.appendChild(packInput);
+        tr.appendChild(packTd);
+
+        const notesTd = document.createElement("td");
+        const notesInput = document.createElement("textarea");
+        notesInput.className = "log-input";
+        notesInput.value = entry.notes || "";
+        notesInput.addEventListener("input", () => {
+          appState.mammoth.entries[idx].notes = notesInput.value;
+          saveState(appState);
+        });
+        notesTd.appendChild(notesInput);
+        tr.appendChild(notesTd);
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const rowControls = document.createElement("div");
+      rowControls.className = "row-controls";
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "clear-btn";
+      clearBtn.textContent = "Clear all hikes";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all Mammoth March entries?")) {
+          appState.mammoth.entries = [];
+          saveState(appState);
+          renderScreen("mammoth");
+        }
+      });
+
+      rowControls.appendChild(clearBtn);
+      section.appendChild(rowControls);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "add-btn";
+      addBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        Add hike
+      `;
+      addBtn.addEventListener("click", () => {
+        appState.mammoth.entries.push({
+          id: makeId(),
+          date: "",
+          distance: "",
+          packWeight: "",
+          notes: ""
+        });
+        saveState(appState);
+        renderScreen("mammoth");
+      });
+      section.appendChild(addBtn);
+
+      const helper = document.createElement("div");
+      helper.className = "helper-text";
+      helper.innerHTML = `
+        <div class="helper-dot"></div>
+        <div>
+          Use this like your Mammoth March tab: log each hike, distance, and pack weight.
+          Over time that green badge shows your total miles.
+        </div>
+      `;
+      section.appendChild(helper);
+
+      return section;
+    }
+
+    function renderDiscGolfScreen() {
+      const section = document.createElement("section");
+      section.className = "card";
+
+      const header = document.createElement("div");
+      header.className = "card-header";
+
+      const totalRounds = (appState.discGolf.entries || []).length;
+      header.innerHTML = `
+        <div>
+          <h2>Disc Golf Log</h2>
+          <span>Track rounds, practice sessions, and notes.</span>
+        </div>
+        <div class="small-badge">
+          <span>${totalRounds}</span> entries
+        </div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th style="min-width:90px;">Date</th>
+          <th style="min-width:90px;">Type</th>
+          <th style="min-width:120px;">Course</th>
+          <th style="min-width:80px;">Score/Notes</th>
+          <th style="min-width:140px;">Focus / Notes</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      (appState.discGolf.entries || []).forEach((entry, idx) => {
+        const tr = document.createElement("tr");
+
+        const dateTd = document.createElement("td");
+        const dateInput = document.createElement("input");
+        dateInput.type = "date";
+        dateInput.className = "log-input";
+        dateInput.value = entry.date || "";
+        dateInput.addEventListener("input", () => {
+          appState.discGolf.entries[idx].date = dateInput.value;
+          saveState(appState);
+        });
+        dateTd.appendChild(dateInput);
+        tr.appendChild(dateTd);
+
+        const typeTd = document.createElement("td");
+        const typeSelect = document.createElement("select");
+        typeSelect.className = "log-input";
+        ["Round", "Field Work", "Putting Practice", "Tournament"].forEach(opt => {
+          const o = document.createElement("option");
+          o.value = opt;
+          o.textContent = opt;
+          if ((entry.type || "") === opt) o.selected = true;
+          typeSelect.appendChild(o);
+        });
+        typeSelect.addEventListener("change", () => {
+          appState.discGolf.entries[idx].type = typeSelect.value;
+          saveState(appState);
+        });
+        typeTd.appendChild(typeSelect);
+        tr.appendChild(typeTd);
+
+        const courseTd = document.createElement("td");
+        const courseInput = document.createElement("input");
+        courseInput.type = "text";
+        courseInput.className = "log-input";
+        courseInput.placeholder = "Course / field";
+        courseInput.value = entry.course || "";
+        courseInput.addEventListener("input", () => {
+          appState.discGolf.entries[idx].course = courseInput.value;
+          saveState(appState);
+        });
+        courseTd.appendChild(courseInput);
+        tr.appendChild(courseTd);
+
+        const scoreTd = document.createElement("td");
+        const scoreInput = document.createElement("input");
+        scoreInput.type = "text";
+        scoreInput.className = "log-input";
+        scoreInput.placeholder = "+3 / 54 / C1: 12/15";
+        scoreInput.value = entry.score || "";
+        scoreInput.addEventListener("input", () => {
+          appState.discGolf.entries[idx].score = scoreInput.value;
+          saveState(appState);
+        });
+        scoreTd.appendChild(scoreInput);
+        tr.appendChild(scoreTd);
+
+        const notesTd = document.createElement("td");
+        const notesInput = document.createElement("textarea");
+        notesInput.className = "log-input";
+        notesInput.placeholder = "Wind, mindset, what to improve…";
+        notesInput.value = entry.notes || "";
+        notesInput.addEventListener("input", () => {
+          appState.discGolf.entries[idx].notes = notesInput.value;
+          saveState(appState);
+        });
+        notesTd.appendChild(notesInput);
+        tr.appendChild(notesTd);
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const rowControls = document.createElement("div");
+      rowControls.className = "row-controls";
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "clear-btn";
+      clearBtn.textContent = "Clear all entries";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all disc golf entries?")) {
+          appState.discGolf.entries = [];
+          saveState(appState);
+          renderScreen("discGolf");
+        }
+      });
+      rowControls.appendChild(clearBtn);
+      section.appendChild(rowControls);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "add-btn";
+      addBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        Add entry
+      `;
+      addBtn.addEventListener("click", () => {
+        appState.discGolf.entries.push({
+          id: makeId(),
+          date: "",
+          type: "Round",
+          course: "",
+          score: "",
+          notes: ""
+        });
+        saveState(appState);
+        renderScreen("discGolf");
+      });
+      section.appendChild(addBtn);
+
+      const helper = document.createElement("div");
+      helper.className = "helper-text";
+      helper.innerHTML = `
+        <div class="helper-dot"></div>
+        <div>
+          Use this like your disc golf tab: quick log of rounds and field work.
+          Capture course, score, and one key takeaway so you can see patterns over 2026.
+        </div>
+      `;
+      section.appendChild(helper);
+
+      return section;
+    }
+
+    function renderYouTubeScreen() {
+      const section = document.createElement("section");
+      section.className = "card";
+
+      const header = document.createElement("div");
+      header.className = "card-header";
+      const totalIdeas = (appState.youtube.entries || []).length;
+      const uploadedCount = (appState.youtube.entries || []).filter(e => e.status === "Uploaded").length;
+      header.innerHTML = `
+        <div>
+          <h2>YouTube Tracker</h2>
+          <span>Keep BP Disc Golfing Dad ideas moving from idea to upload.</span>
+        </div>
+        <div class="small-badge">
+          <span>${uploadedCount}</span> uploaded / ${totalIdeas} ideas
+        </div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th style="min-width:140px;">Video Idea</th>
+          <th style="min-width:100px;">Status</th>
+          <th style="min-width:90px;">Target Date</th>
+          <th style="min-width:140px;">Notes</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      (appState.youtube.entries || []).forEach((entry, idx) => {
+        const tr = document.createElement("tr");
+
+        const titleTd = document.createElement("td");
+        const titleInput = document.createElement("input");
+        titleInput.type = "text";
+        titleInput.className = "log-input";
+        titleInput.placeholder = "e.g., C1 Putting Drill for MA4s";
+        titleInput.value = entry.title || "";
+        titleInput.addEventListener("input", () => {
+          appState.youtube.entries[idx].title = titleInput.value;
+          saveState(appState);
+        });
+        titleTd.appendChild(titleInput);
+        tr.appendChild(titleTd);
+
+        const statusTd = document.createElement("td");
+        const statusSelect = document.createElement("select");
+        statusSelect.className = "log-input";
+        ["Idea", "Planning", "Filming", "Editing", "Uploaded"].forEach(opt => {
+          const o = document.createElement("option");
+          o.value = opt;
+          o.textContent = opt;
+          if ((entry.status || "Idea") === opt) o.selected = true;
+          statusSelect.appendChild(o);
+        });
+        statusSelect.addEventListener("change", () => {
+          appState.youtube.entries[idx].status = statusSelect.value;
+          saveState(appState);
+          renderScreen("youtube");
+        });
+        statusTd.appendChild(statusSelect);
+        tr.appendChild(statusTd);
+
+        const dateTd = document.createElement("td");
+        const dateInput = document.createElement("input");
+        dateInput.type = "date";
+        dateInput.className = "log-input";
+        dateInput.value = entry.targetDate || "";
+        dateInput.addEventListener("input", () => {
+          appState.youtube.entries[idx].targetDate = dateInput.value;
+          saveState(appState);
+        });
+        dateTd.appendChild(dateInput);
+        tr.appendChild(dateTd);
+
+        const notesTd = document.createElement("td");
+        const notesInput = document.createElement("textarea");
+        notesInput.className = "log-input";
+        notesInput.placeholder = "Hook, thumbnail idea, sponsor shout-outs…";
+        notesInput.value = entry.notes || "";
+        notesInput.addEventListener("input", () => {
+          appState.youtube.entries[idx].notes = notesInput.value;
+          saveState(appState);
+        });
+        notesTd.appendChild(notesInput);
+        tr.appendChild(notesTd);
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const rowControls = document.createElement("div");
+      rowControls.className = "row-controls";
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "clear-btn";
+      clearBtn.textContent = "Clear all ideas";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all YouTube ideas?")) {
+          appState.youtube.entries = [];
+          saveState(appState);
+          renderScreen("youtube");
+        }
+      });
+      rowControls.appendChild(clearBtn);
+      section.appendChild(rowControls);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "add-btn";
+      addBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        Add idea
+      `;
+      addBtn.addEventListener("click", () => {
+        appState.youtube.entries.push({
+          id: makeId(),
+          title: "",
+          status: "Idea",
+          targetDate: "",
+          notes: ""
+        });
+        saveState(appState);
+        renderScreen("youtube");
+      });
+      section.appendChild(addBtn);
+
+      const helper = document.createElement("div");
+      helper.className = "helper-text";
+      helper.innerHTML = `
+        <div class="helper-dot"></div>
+        <div>
+          This mirrors your YouTube tab: one row per video, with status and target date.
+          Use it while you're out playing or between tasks so ideas never get lost.
+        </div>
+      `;
+      section.appendChild(helper);
+
+      return section;
+    }
+
+    (function init() {
+      const active = appState.activeTab || "weekly";
+      setActiveTab(active);
+    })();
+  </script>
+</body>
+</html>
