@@ -6,13 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg: #0f172a;
-      --bg-elevated: #111827;
+      --bg: #020617;
+      --bg-elevated: #0b1120;
       --accent: #22c55e;
-      --accent-soft: rgba(34, 197, 94, 0.12);
+      --accent-soft: rgba(34, 197, 94, 0.14);
       --text-main: #f9fafb;
       --text-muted: #9ca3af;
       --border-subtle: #1f2937;
+      --danger: #ef4444;
     }
     * {
       box-sizing: border-box;
@@ -29,13 +30,13 @@
     }
     .app-shell {
       flex: 1;
-      max-width: 960px;
+      max-width: 1100px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
     }
     header {
-      padding: 16px 16px 8px;
+      padding: 14px 14px 6px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -44,11 +45,12 @@
     .title-block {
       display: flex;
       flex-direction: column;
+      gap: 2px;
     }
     .title-block h1 {
       margin: 0;
-      font-size: 1.1rem;
-      letter-spacing: 0.03em;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
     }
     .title-block span {
@@ -75,12 +77,42 @@
     }
     main {
       flex: 1;
-      padding: 0 12px 72px;
+      padding: 0 10px 70px;
     }
-    .tab-strip {
+
+    /* Group + tab nav */
+    .group-strip {
       display: flex;
       gap: 8px;
-      padding: 0 4px 8px;
+      padding: 4px 0 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .group-strip::-webkit-scrollbar {
+      display: none;
+    }
+    .group-chip {
+      white-space: nowrap;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .group-chip.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .tab-strip {
+      display: flex;
+      gap: 6px;
+      padding: 0 0 8px;
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -89,28 +121,30 @@
     }
     .tab-chip {
       white-space: nowrap;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 999px;
       border: 1px solid var(--border-subtle);
       background: rgba(15, 23, 42, 0.9);
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
       cursor: pointer;
       flex-shrink: 0;
     }
     .tab-chip.active {
-      background: var(--accent-soft);
+      background: rgba(34, 197, 94, 0.18);
       border-color: var(--accent);
       color: var(--text-main);
       font-weight: 600;
     }
+
+    /* Card & table */
     .card {
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       border-radius: 18px;
       border: 1px solid var(--border-subtle);
       box-shadow:
         0 18px 45px rgba(0, 0, 0, 0.6),
-        0 0 0 1px rgba(148, 163, 184, 0.12) inset;
+        0 0 0 1px rgba(148, 163, 184, 0.18) inset;
       padding: 12px;
       margin-top: 4px;
     }
@@ -129,9 +163,24 @@
       font-size: 0.75rem;
       color: var(--text-muted);
     }
+    .badge {
+      border-radius: 999px;
+      padding: 5px 10px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge span {
+      color: var(--accent);
+    }
+
     .week-pill {
       border-radius: 999px;
-      padding: 6px 10px;
+      padding: 5px 10px;
       border: 1px solid var(--border-subtle);
       font-size: 0.8rem;
       color: var(--text-muted);
@@ -145,17 +194,13 @@
       color: var(--text-main);
       font-weight: 500;
     }
-    .week-pill svg {
-      width: 14px;
-      height: 14px;
-      opacity: 0.6;
-    }
+
     .table-wrapper {
       margin-top: 4px;
       border-radius: 12px;
-      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.1), rgba(15, 23, 42, 0.9));
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.16), rgba(15, 23, 42, 0.94));
       overflow: auto;
-      border: 1px solid rgba(31, 41, 55, 0.9);
+      border: 1px solid rgba(31, 41, 55, 0.95);
     }
     table {
       width: 100%;
@@ -164,7 +209,7 @@
       min-width: 100%;
     }
     thead {
-      background: linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.7));
+      background: linear-gradient(to right, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.75));
       position: sticky;
       top: 0;
       z-index: 1;
@@ -182,11 +227,12 @@
       border-bottom: none;
     }
     tbody tr:nth-child(even) {
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.85);
     }
     tbody tr:nth-child(odd) {
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.7);
     }
+
     .category-label {
       font-weight: 500;
       font-size: 0.78rem;
@@ -197,7 +243,8 @@
       color: var(--text-muted);
       font-weight: 400;
     }
-    input.day-input,
+
+    input.small-input,
     input.log-input,
     select.log-input,
     textarea.log-input {
@@ -209,11 +256,11 @@
       color: var(--text-main);
       font-size: 0.72rem;
     }
-    input.day-input {
-      max-width: 52px;
+    input.small-input {
+      max-width: 56px;
       text-align: center;
     }
-    input.day-input:focus,
+    input.small-input:focus,
     input.log-input:focus,
     select.log-input:focus,
     textarea.log-input:focus {
@@ -222,14 +269,57 @@
     }
     textarea.log-input {
       resize: vertical;
-      min-height: 48px;
+      min-height: 52px;
     }
-    .summary-cell {
-      font-size: 0.8rem;
+
+    .summary-row {
+      background: rgba(15, 23, 42, 1);
+    }
+    .summary-row td {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(31, 41, 55, 0.95);
+    }
+    .summary-label {
       font-weight: 500;
-      color: var(--accent);
-      min-width: 48px;
+      color: var(--text-main);
     }
+    .summary-value {
+      color: var(--accent);
+      font-weight: 500;
+      text-align: right;
+      padding-right: 12px;
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 0.7rem;
+    }
+    .btn {
+      border-radius: 999px;
+      padding: 5px 10px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.98);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-primary {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--text-main);
+    }
+    .btn-danger {
+      border-color: rgba(239, 68, 68, 0.7);
+      color: #fecaca;
+    }
+
     .helper-text {
       margin-top: 8px;
       font-size: 0.7rem;
@@ -245,74 +335,51 @@
       background: var(--accent);
       margin-top: 4px;
     }
-    .add-btn {
-      margin-top: 8px;
-      border-radius: 999px;
-      padding: 6px 10px;
+
+    .analytics-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 6px;
+    }
+    .analytics-card {
+      border-radius: 12px;
       border: 1px solid rgba(31, 41, 55, 0.9);
-      background: var(--accent-soft);
-      color: var(--text-main);
-      font-size: 0.75rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
+      background: rgba(15, 23, 42, 0.96);
+      padding: 6px 8px;
+      font-size: 0.72rem;
     }
-    .add-btn svg {
-      width: 14px;
-      height: 14px;
-    }
-    .small-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      font-size: 0.7rem;
+    .analytics-label {
       color: var(--text-muted);
-      background: rgba(15, 23, 42, 0.9);
-      margin-left: 4px;
     }
-    .small-badge span {
+    .analytics-value {
       color: var(--accent);
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-top: 2px;
     }
-    .row-controls {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 4px;
-      gap: 6px;
-      font-size: 0.7rem;
-    }
-    .clear-btn {
-      border-radius: 999px;
-      padding: 4px 8px;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-muted);
-      cursor: pointer;
-    }
+
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      max-width: 960px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 6px 10px 10px;
-      background: linear-gradient(to top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.9));
-      border-top: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 6px 9px 10px;
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.94));
+      border-top: 1px solid rgba(31, 41, 55, 0.95);
       display: flex;
       justify-content: space-between;
-      gap: 8px;
-      backdrop-filter: blur(20px);
+      gap: 6px;
+      backdrop-filter: blur(18px);
     }
     .nav-btn {
       flex: 1;
       border-radius: 999px;
-      padding: 6px;
+      padding: 6px 6px;
       border: 1px solid rgba(31, 41, 55, 0.9);
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.98);
       font-size: 0.7rem;
       color: var(--text-muted);
       display: flex;
@@ -321,16 +388,15 @@
       gap: 2px;
       cursor: pointer;
     }
-    .nav-btn span {
-      max-width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
     .nav-btn svg {
       width: 16px;
       height: 16px;
-      opacity: 0.7;
+      opacity: 0.75;
+    }
+    .nav-btn span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .nav-btn.active {
       border-color: var(--accent);
@@ -340,6 +406,7 @@
     .nav-btn.active svg {
       opacity: 1;
     }
+
     @media (min-width: 768px) {
       header {
         padding-top: 20px;
@@ -353,7 +420,7 @@
       table {
         font-size: 0.8rem;
       }
-      input.day-input {
+      input.small-input {
         max-width: 64px;
       }
     }
@@ -364,72 +431,90 @@
     <header>
       <div class="title-block">
         <h1>Yearly Life Betterment</h1>
-        <span>2026 dashboard in your pocket</span>
+        <span>All your 2026 trackers in one phone app</span>
       </div>
       <div class="pill">
         <div class="pill-dot"></div>
-        <span>On your phone · Offline</span>
+        <span>Offline · Stored on this device</span>
       </div>
     </header>
 
     <main>
-      <div class="tab-strip" id="tabStrip">
-        <!-- Tabs injected here -->
-      </div>
-
-      <section id="screenContainer">
-        <!-- Active screen injected here -->
-      </section>
+      <div class="group-strip" id="groupStrip"></div>
+      <div class="tab-strip" id="tabStrip"></div>
+      <section id="screenContainer"></section>
     </main>
   </div>
 
-  <nav class="bottom-nav" id="bottomNav">
-    <!-- Bottom nav buttons injected here -->
-  </nav>
+  <nav class="bottom-nav" id="bottomNav"></nav>
 
   <script>
-    const STORAGE_KEY = "bettermentTracker_v2";
+    const STORAGE_KEY = "bettermentTracker_v3";
 
+    /* ---- CONFIG: GROUPS + TABS (match your Excel tabs logically) ---- */
     const appConfig = {
-      tabs: [
+      groups: [
         {
-          id: "weekly",
-          label: "Weekly Tracker",
-          description: "Log core habits for the current week.",
-          icon: "grid",
-          type: "weeklyGrid"
+          id: "life",
+          label: "Life & Reflection",
+          icon: "life",
+          tabs: [
+            { id: "week_tracker", label: "Week Tracker", type: "weekGrid" },
+            { id: "personal_tracker", label: "Daily Personal", type: "log_personal" },
+            { id: "highlights", label: "Weekly Wins", type: "log_highlights" },
+            { id: "month_view", label: "Month View", type: "log_month" }
+          ]
         },
         {
-          id: "mammoth",
-          label: "Mammoth March",
-          description: "Training log: distance & pack weight.",
-          icon: "chart",
-          type: "mammothLog"
+          id: "health",
+          label: "Health & Fitness",
+          icon: "health",
+          tabs: [
+            { id: "weight_fitness", label: "Weight & Steps", type: "log_weight" },
+            { id: "mammoth", label: "Mammoth Tracker", type: "log_mammoth" }
+          ]
         },
         {
-          id: "discGolf",
+          id: "disc",
           label: "Disc Golf",
-          description: "Rounds & practice notes.",
-          icon: "check",
-          type: "discGolfLog"
+          icon: "disc",
+          tabs: [
+            { id: "dg_practice", label: "Practice Log", type: "log_dg_practice" },
+            { id: "dg_round", label: "Round Log", type: "log_dg_round" },
+            { id: "dg_tournament", label: "Tournament Log", type: "log_dg_tournament" },
+            { id: "vetsdg", label: "Vets DG Outreach", type: "log_vetsdg" }
+          ]
         },
         {
           id: "youtube",
-          label: "YouTube Tracker",
-          description: "Video ideas & status.",
-          icon: "play",
-          type: "youtubeLog"
+          label: "YouTube",
+          icon: "youtube",
+          tabs: [
+            { id: "yt_tracker", label: "YouTube Tracker", type: "log_youtube" },
+            { id: "yt_ideas", label: "Video Ideas", type: "log_yt_ideas" },
+            { id: "yt_long_template", label: "Long Script Notes", type: "template_long" },
+            { id: "yt_short_template", label: "Short Script Notes", type: "template_short" }
+          ]
+        },
+        {
+          id: "skills",
+          label: "Skills & Certs",
+          icon: "skills",
+          tabs: [
+            { id: "guitar", label: "Guitar Practice", type: "log_guitar" },
+            { id: "certs", label: "Certs Tracker", type: "log_certs" }
+          ]
         }
       ],
       weekly: {
         days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         rows: [
-          { id: "strength", label: "Strength", summaryLabel: "Strength Workouts Done" },
-          { id: "walk", label: "Walk", summaryLabel: "Walk Days Done" },
-          { id: "hike", label: "Hike (Long)", summaryLabel: "Total Miles" },
+          { id: "strength", label: "Strength", summary: "Strength Workouts Done" },
+          { id: "walk", label: "Walk", summary: "Walk Days Done" },
+          { id: "hike", label: "Hike (Long)", summary: "Total Miles" },
           { id: "weight", label: "Weight" },
-          { id: "dg_practice", label: "DG Practice", summaryLabel: "Disc Golf Practice" },
-          { id: "dg_round", label: "DG Round/Tournament", summaryLabel: "Disc Golf Rounds" },
+          { id: "dg_practice", label: "DG Practice", summary: "Disc Golf Practice" },
+          { id: "dg_round", label: "DG Round/Tournament", summary: "Disc Golf Rounds" },
           { id: "vets_local", label: "Vets Local" },
           { id: "vets_national", label: "Vets National" },
           { id: "guitar", label: "Guitar Practice" },
@@ -449,145 +534,332 @@
       }
     };
 
+    /* YouTube subcategory options from Lists tab */
+    const ytVideoTypeOptions = ["Long", "Short"];
+    const ytCategoryOptions = [
+      "1 - Skill",
+      "2 - Gear",
+      "3 - Course",
+      "4 - Tournament",
+      "5 - Lifestyle",
+      "6 - Challenge",
+      "7 - ShortVideos"
+    ];
+    const ytSubcategoryOptions = [
+      "1a - Beginner Tips",
+      "1b - Putting",
+      "1c - Forehand",
+      "1d - Backhand",
+      "1e - Approach",
+      "1f - Form Fix",
+      "1g - Wind Play",
+      "2a - Disc Review",
+      "2b - Bag Setup",
+      "2c - Starter Discs",
+      "2d - Gear Review",
+      "2e - Course Gear",
+      "2f - Brand Comparison",
+      "3a - Course",
+      "3b - Course Review",
+      "3c - Walkthrough",
+      "3d - Round Breakdown",
+      "3e - Field Work",
+      "4a - Tournament",
+      "4b - Tournament Vlog",
+      "5a - Lifestyle",
+      "5b - Vet Disc Golf",
+      "5c - Mental Game",
+      "6 - Challenge",
+      "6a - Challenge",
+      "6b - Putting Challenge",
+      "6c - Fieldwork Challenge",
+      "6d - Rating my Round",
+      "6e - 30-Day Challenge",
+      "6f - Disc Battle",
+      "7 - ShortVideos",
+      "7a - Quick Tips",
+      "7b - Drill",
+      "7c - Disc Review (Short)",
+      "7d - Motivation",
+      "7e - Inspiring Shot",
+      "7f - Fail/Funny",
+      "7g - Teaser"
+    ];
+
+    /* Build flat tab config map */
+    const tabConfigs = {};
+    appConfig.groups.forEach(group => {
+      group.tabs.forEach(tab => {
+        tab.groupId = group.id;
+        tabConfigs[tab.id] = tab;
+      });
+    });
+
+    /* ---- STATE MANAGEMENT ---- */
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return {};
         return JSON.parse(raw);
       } catch (e) {
-        console.warn("Failed to parse saved data", e);
+        console.warn("Failed to parse saved state", e);
         return {};
       }
     }
 
-    function saveState(state) {
+    function saveState() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
       } catch (e) {
-        console.warn("Failed to save", e);
+        console.warn("Failed to save state", e);
       }
     }
 
-    function ensureDefaultState(state) {
-      if (!state.weekly) {
-        state.weekly = { weekLabel: "This Week", data: {} };
-      }
-      if (!state.mammoth) {
-        state.mammoth = { entries: [] };
-      }
-      if (!state.discGolf) {
-        state.discGolf = { entries: [] };
-      }
-      if (!state.youtube) {
-        state.youtube = { entries: [] };
-      }
+    function ensureDefaults(state) {
+      if (!state || typeof state !== "object") state = {};
+      if (!state.views) state.views = {};
+      if (!state.activeGroup) state.activeGroup = "life";
+      if (!state.activeTab) state.activeTab = "week_tracker";
+
+      Object.values(tabConfigs).forEach(tab => {
+        if (!state[tab.id]) {
+          if (tab.type === "weekGrid") {
+            state[tab.id] = { weekLabel: "This Week", data: {} };
+          } else {
+            state[tab.id] = { entries: [] };
+          }
+        }
+      });
       return state;
     }
 
-    let appState = ensureDefaultState(loadState());
+    let appState = ensureDefaults(loadState());
 
-    function makeId() {
-      return "id_" + Math.random().toString(36).slice(2, 10);
+    /* ---- CSV EXPORT HELPERS ---- */
+    function csvEscape(val) {
+      if (val === null || val === undefined) return "";
+      const s = String(val);
+      if (/[",\r\n]/.test(s)) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
     }
 
-    function renderTabs(activeId) {
-      const strip = document.getElementById("tabStrip");
-      strip.innerHTML = "";
-      appConfig.tabs.forEach(tab => {
-        const chip = document.createElement("button");
-        chip.type = "button";
-        chip.className = "tab-chip" + (tab.id === activeId ? " active" : "");
-        chip.textContent = tab.label;
-        chip.addEventListener("click", () => setActiveTab(tab.id));
-        strip.appendChild(chip);
+    function exportCsv(headers, rows, filename) {
+      const lines = [];
+      lines.push(headers.map(csvEscape).join(","));
+      rows.forEach(row => {
+        lines.push(row.map(csvEscape).join(","));
       });
+      const blob = new Blob([lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
-    function bottomIcon(name) {
-      if (name === "grid") {
+    /* ---- NAV RENDERING ---- */
+    function iconSvg(kind) {
+      if (kind === "life") {
         return `
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="3" y="3" width="7" height="7" rx="2"></rect>
-            <rect x="14" y="3" width="7" height="7" rx="2"></rect>
-            <rect x="3" y="14" width="7" height="7" rx="2"></rect>
-            <rect x="14" y="14" width="7" height="7" rx="2"></rect>
-          </svg>
-        `;
+            <path d="M5 20h14M5 10h14M5 4h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          </svg>`;
       }
-      if (name === "check") {
+      if (kind === "health") {
         return `
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
-        `;
+            <path d="M12 21s-6-4.35-9-8.4C1 9 2.5 5.5 6 5.5c2 0 3.5 1.5 3.9 2.1C10.5 7 12 5.5 14 5.5c3.5 0 5 3.5 3 7.1-3 4.05-9 8.4-9 8.4z" fill="none" stroke="currentColor" stroke-width="2"></path>
+          </svg>`;
       }
-      if (name === "chart") {
+      if (kind === "disc") {
         return `
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 19h16M7 16v-5M12 16V5M17 16v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
-        `;
+            <ellipse cx="12" cy="7" rx="8" ry="3" fill="none" stroke="currentColor" stroke-width="2"></ellipse>
+            <path d="M4 7v6c0 1.66 3.58 3 8 3s8-1.34 8-3V7" fill="none" stroke="currentColor" stroke-width="2"></path>
+            <path d="M4 13v4c0 1.66 3.58 3 8 3s8-1.34 8-3v-4" fill="none" stroke="currentColor" stroke-width="2"></path>
+          </svg>`;
       }
-      if (name === "play") {
+      if (kind === "youtube") {
         return `
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 5v14l11-7z" fill="currentColor"></path>
-          </svg>
-        `;
+            <path d="M4 7.5C4 6.12 5.12 5 6.5 5h11C18.88 5 20 6.12 20 7.5v9c0 1.38-1.12 2.5-2.5 2.5h-11C5.12 19 4 17.88 4 16.5v-9z" fill="none" stroke="currentColor" stroke-width="2"></path>
+            <path d="M10 9l5 3-5 3V9z" fill="currentColor"></path>
+          </svg>`;
+      }
+      if (kind === "skills") {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3l2.09 4.24L19 8.27l-3.5 3.41L16.18 17 12 14.9 7.82 17l.68-5.32L5 8.27l4.91-1.03L12 3z" fill="none" stroke="currentColor" stroke-width="2"></path>
+          </svg>`;
       }
       return `
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle>
-        </svg>
-      `;
+        </svg>`;
     }
 
-    function renderBottomNav(activeId) {
-      const nav = document.getElementById("bottomNav");
-      nav.innerHTML = "";
-      appConfig.tabs.forEach(tab => {
+    function renderGroupNav() {
+      const groupStrip = document.getElementById("groupStrip");
+      groupStrip.innerHTML = "";
+      appConfig.groups.forEach(group => {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "nav-btn" + (tab.id === activeId ? " active" : "");
-        btn.innerHTML = `
-          ${bottomIcon(tab.icon)}
-          <span>${tab.label}</span>
-        `;
-        btn.addEventListener("click", () => setActiveTab(tab.id));
-        nav.appendChild(btn);
+        btn.className = "group-chip" + (group.id === appState.activeGroup ? " active" : "");
+        btn.textContent = group.label;
+        btn.addEventListener("click", () => {
+          setActiveGroup(group.id);
+        });
+        groupStrip.appendChild(btn);
       });
     }
 
-    function setActiveTab(tabId) {
-      appState.activeTab = tabId;
-      saveState(appState);
-      renderTabs(tabId);
-      renderBottomNav(tabId);
-      renderScreen(tabId);
+    function renderTabNav() {
+      const tabStrip = document.getElementById("tabStrip");
+      tabStrip.innerHTML = "";
+      const group = appConfig.groups.find(g => g.id === appState.activeGroup) || appConfig.groups[0];
+      group.tabs.forEach(tab => {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "tab-chip" + (tab.id === appState.activeTab ? " active" : "");
+        chip.textContent = tab.label;
+        chip.addEventListener("click", () => {
+          setActiveTab(tab.id);
+        });
+        tabStrip.appendChild(chip);
+      });
     }
 
-    function renderScreen(tabId) {
-      const container = document.getElementById("screenContainer");
-      const tab = appConfig.tabs.find(t => t.id === tabId) || appConfig.tabs[0];
+    function renderBottomNav() {
+      const bottomNav = document.getElementById("bottomNav");
+      bottomNav.innerHTML = "";
+      appConfig.groups.forEach(group => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "nav-btn" + (group.id === appState.activeGroup ? " active" : "");
+        btn.innerHTML = iconSvg(group.icon) + `<span>${group.label}</span>`;
+        btn.addEventListener("click", () => {
+          setActiveGroup(group.id);
+        });
+        bottomNav.appendChild(btn);
+      });
+    }
 
-      if (tab.type === "weeklyGrid") {
-        container.innerHTML = "";
-        container.appendChild(renderWeeklyGridScreen());
-      } else if (tab.type === "mammothLog") {
-        container.innerHTML = "";
-        container.appendChild(renderMammothScreen());
-      } else if (tab.type === "discGolfLog") {
-        container.innerHTML = "";
-        container.appendChild(renderDiscGolfScreen());
-      } else if (tab.type === "youtubeLog") {
-        container.innerHTML = "";
-        container.appendChild(renderYouTubeScreen());
-      } else {
-        container.innerHTML = "<p style='padding:12px;font-size:0.85rem;color:var(--text-muted);'>Screen not implemented yet.</p>";
+    function setActiveGroup(groupId) {
+      appState.activeGroup = groupId;
+      const group = appConfig.groups.find(g => g.id === groupId) || appConfig.groups[0];
+      const firstTabId = group.tabs[0].id;
+      if (!appState.activeTab || tabConfigs[appState.activeTab].groupId !== groupId) {
+        appState.activeTab = firstTabId;
       }
+      saveState();
+      renderGroupNav();
+      renderTabNav();
+      renderBottomNav();
+      renderScreen();
     }
 
-    function renderWeeklyGridScreen() {
+    function setActiveTab(tabId) {
+      if (!tabConfigs[tabId]) return;
+      appState.activeTab = tabId;
+      appState.activeGroup = tabConfigs[tabId].groupId;
+      saveState();
+      renderGroupNav();
+      renderTabNav();
+      renderBottomNav();
+      renderScreen();
+    }
+
+    /* ---- UTIL: analytics helpers ---- */
+    function toNumber(val) {
+      const n = parseFloat(val);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function avg(nums) {
+      const filtered = nums.filter(n => !isNaN(n));
+      if (!filtered.length) return 0;
+      return filtered.reduce((a, b) => a + b, 0) / filtered.length;
+    }
+
+    /* ---- SCREEN RENDERING ---- */
+    function renderScreen() {
+      const container = document.getElementById("screenContainer");
+      const activeTabId = appState.activeTab;
+      const tabConfig = tabConfigs[activeTabId];
+      if (!tabConfig) {
+        container.innerHTML = "<p style='padding:12px;font-size:0.85rem;color:var(--text-muted);'>No tab selected.</p>";
+        return;
+      }
+
+      let node;
+      switch (tabConfig.type) {
+        case "weekGrid":
+          node = renderWeekTracker();
+          break;
+        case "log_personal":
+          node = renderPersonalTracker();
+          break;
+        case "log_highlights":
+          node = renderHighlights();
+          break;
+        case "log_month":
+          node = renderMonthView();
+          break;
+        case "log_weight":
+          node = renderWeightFitness();
+          break;
+        case "log_mammoth":
+          node = renderMammoth();
+          break;
+        case "log_dg_practice":
+          node = renderDGPractice();
+          break;
+        case "log_dg_round":
+          node = renderDGRound();
+          break;
+        case "log_dg_tournament":
+          node = renderDGTournament();
+          break;
+        case "log_vetsdg":
+          node = renderVetsDG();
+          break;
+        case "log_youtube":
+          node = renderYouTubeTracker();
+          break;
+        case "log_yt_ideas":
+          node = renderYTIdeas();
+          break;
+        case "template_long":
+          node = renderYTLongTemplate();
+          break;
+        case "template_short":
+          node = renderYTShortTemplate();
+          break;
+        case "log_guitar":
+          node = renderGuitar();
+          break;
+        case "log_certs":
+          node = renderCerts();
+          break;
+        default:
+          node = document.createElement("div");
+          node.innerHTML = "<p style='padding:12px;font-size:0.85rem;color:var(--text-muted);'>Screen not implemented.</p>";
+      }
+
+      container.innerHTML = "";
+      container.appendChild(node);
+    }
+
+    /* ---- WEEK TRACKER (Week_Tracker) ---- */
+    function renderWeekTracker() {
+      const tabId = "week_tracker";
+      const state = appState[tabId];
+
       const section = document.createElement("section");
       section.className = "card";
 
@@ -596,14 +868,11 @@
       header.innerHTML = `
         <div>
           <h2>Weekly Habit Grid</h2>
-          <span>One place to log 2026 progress for this week.</span>
+          <span>Direct from Week_Tracker tab: categories × days.</span>
         </div>
         <button type="button" class="week-pill" id="weekLabelBtn">
           <span>Week:</span>
-          <strong>${appState.weekly.weekLabel || "This Week"}</strong>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 10l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
+          <strong>${state.weekLabel || "This Week"}</strong>
         </button>
       `;
       section.appendChild(header);
@@ -634,72 +903,145 @@
 
       const tbody = document.createElement("tbody");
 
+      let overallTotal = 0;
+
       appConfig.weekly.rows.forEach(row => {
         const tr = document.createElement("tr");
         const labelTd = document.createElement("td");
         labelTd.className = "category-label";
-        labelTd.innerHTML = row.label + (row.summaryLabel ? `<span>${row.summaryLabel}</span>` : "");
+        labelTd.innerHTML = row.label + (row.summary ? `<span>${row.summary}</span>` : "");
         tr.appendChild(labelTd);
 
         let rowTotal = 0;
-
         appConfig.weekly.days.forEach(day => {
           const td = document.createElement("td");
-          const stored = (appState.weekly.data[row.id] && appState.weekly.data[row.id][day]) || "";
+          const stored = (state.data[row.id] && state.data[row.id][day]) || "";
           const input = document.createElement("input");
           input.type = "number";
           input.inputMode = "decimal";
           input.min = "0";
           input.step = "0.01";
-          input.className = "day-input";
+          input.className = "small-input";
           input.value = stored;
           if (stored !== "" && !isNaN(parseFloat(stored))) {
             rowTotal += parseFloat(stored);
           }
           input.addEventListener("input", () => {
             const value = input.value;
-            if (!appState.weekly.data[row.id]) {
-              appState.weekly.data[row.id] = {};
-            }
-            appState.weekly.data[row.id][day] = value;
-            saveState(appState);
+            if (!state.data[row.id]) state.data[row.id] = {};
+            state.data[row.id][day] = value;
+            saveState();
+            // Update total cell only (not full re-render)
+            const num = parseFloat(value);
+            renderScreen(); // simple path: re-render whole screen
           });
           td.appendChild(input);
           tr.appendChild(td);
         });
 
+        overallTotal += rowTotal;
+
         const totalTd = document.createElement("td");
-        totalTd.className = "summary-cell";
+        totalTd.className = "summary-value";
         totalTd.textContent = rowTotal ? rowTotal.toFixed(2).replace(/\.00$/, "") : "–";
         tr.appendChild(totalTd);
         tbody.appendChild(tr);
       });
 
+      // Summary row
+      const summaryTr = document.createElement("tr");
+      summaryTr.className = "summary-row";
+      const labelTd = document.createElement("td");
+      labelTd.className = "summary-label";
+      labelTd.textContent = "Overall total (all numeric cells)";
+      summaryTr.appendChild(labelTd);
+
+      appConfig.weekly.days.forEach(() => {
+        const td = document.createElement("td");
+        summaryTr.appendChild(td);
+      });
+      const valTd = document.createElement("td");
+      valTd.className = "summary-value";
+      valTd.textContent = overallTotal ? overallTotal.toFixed(2).replace(/\.00$/, "") : "–";
+      summaryTr.appendChild(valTd);
+      tbody.appendChild(summaryTr);
+
       table.appendChild(tbody);
       tableWrapper.appendChild(table);
       section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (Week_Tracker)";
+      exportBtn.addEventListener("click", () => {
+        const headers = ["Category", ...appConfig.weekly.days, "Weekly Summary"];
+        const rows = appConfig.weekly.rows.map(row => {
+          const rowData = [row.label];
+          appConfig.weekly.days.forEach(day => {
+            const val = (state.data[row.id] && state.data[row.id][day]) || "";
+            rowData.push(val);
+          });
+          rowData.push(row.summary || "");
+          return rowData;
+        });
+        exportCsv(headers, rows, "Week_Tracker.csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear week";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all values for this week?")) {
+          appState[tabId] = { weekLabel: state.weekLabel, data: {} };
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
 
       const helper = document.createElement("div");
       helper.className = "helper-text";
       helper.innerHTML = `
         <div class="helper-dot"></div>
         <div>
-          Type numbers for each day (miles, workouts, minutes, reps &mdash; whatever fits the row).
-          Your entries stay on this device only, stored in your browser. Add this page to your Android home screen for quick access.
+          Use this like your Week_Tracker sheet. Each row is a habit/metric, columns are days.
+          Analytics below will pull totals from here for other logs or just for a quick glance.
         </div>
       `;
       section.appendChild(helper);
+
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Total numeric entries</div>
+          <div class="analytics-value">${overallTotal ? overallTotal.toFixed(1) : "0.0"}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Tracked categories</div>
+          <div class="analytics-value">${appConfig.weekly.rows.length}</div>
+        </div>
+      `;
+      section.appendChild(analytics);
 
       setTimeout(() => {
         const weekBtn = document.getElementById("weekLabelBtn");
         if (weekBtn) {
           weekBtn.addEventListener("click", () => {
-            const current = appState.weekly.weekLabel || "This Week";
+            const current = state.weekLabel || "This Week";
             const next = prompt("Set a label for this week (e.g., 'Week 1 · Jan 1–7'):", current);
             if (next !== null && next.trim() !== "") {
-              appState.weekly.weekLabel = next.trim();
-              saveState(appState);
-              renderScreen("weekly");
+              state.weekLabel = next.trim();
+              saveState();
+              renderScreen();
             }
           });
         }
@@ -708,24 +1050,414 @@
       return section;
     }
 
-    function renderMammothScreen() {
+    /* ---- GENERIC LOG RENDERERS ---- */
+    function makeDateInput(value, onChange) {
+      const input = document.createElement("input");
+      input.type = "date";
+      input.className = "log-input";
+      input.value = value || "";
+      input.addEventListener("input", () => onChange(input.value));
+      return input;
+    }
+
+    function makeTextInput(value, placeholder, onChange) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "log-input";
+      if (placeholder) input.placeholder = placeholder;
+      input.value = value || "";
+      input.addEventListener("input", () => onChange(input.value));
+      return input;
+    }
+
+    function makeNumberInput(value, step, min, onChange) {
+      const input = document.createElement("input");
+      input.type = "number";
+      input.className = "log-input";
+      input.inputMode = "decimal";
+      if (step != null) input.step = step;
+      if (min != null) input.min = min;
+      input.value = value || "";
+      input.addEventListener("input", () => onChange(input.value));
+      return input;
+    }
+
+    function makeSelect(options, value, onChange) {
+      const select = document.createElement("select");
+      select.className = "log-input";
+      options.forEach(opt => {
+        const o = document.createElement("option");
+        o.value = opt;
+        o.textContent = opt;
+        if ((value || "") === opt) o.selected = true;
+        select.appendChild(o);
+      });
+      select.addEventListener("change", () => onChange(select.value));
+      return select;
+    }
+
+    function makeTextarea(value, placeholder, onChange) {
+      const ta = document.createElement("textarea");
+      ta.className = "log-input";
+      if (placeholder) ta.placeholder = placeholder;
+      ta.value = value || "";
+      ta.addEventListener("input", () => onChange(ta.value));
+      return ta;
+    }
+
+    /* ---- PERSONAL_TRACKER ---- */
+    function renderPersonalTracker() {
+      const tabId = "personal_tracker";
+      const state = appState[tabId];
+
       const section = document.createElement("section");
       section.className = "card";
 
       const header = document.createElement("div");
       header.className = "card-header";
-      const totalDistance = (appState.mammoth.entries || []).reduce((sum, e) => {
-        const d = parseFloat(e.distance || "0");
-        return sum + (isNaN(d) ? 0 : d);
-      }, 0);
+      const entries = state.entries || [];
       header.innerHTML = `
         <div>
-          <h2>Mammoth March Training</h2>
-          <span>Log training hikes: distance, pack weight, and notes.</span>
+          <h2>Daily Personal Tracker</h2>
+          <span>Sleep, stress, energy, mood, gratitude from Personal_Tracker tab.</span>
         </div>
-        <div class="small-badge">
-          <span>${totalDistance ? totalDistance.toFixed(1) : "0.0"}</span> mi logged
+        <div class="badge"><span>${entries.length}</span> days logged</div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Date</th>
+          <th>Sleep (hrs)</th>
+          <th>Stress (1-5)</th>
+          <th>Energy (1-5)</th>
+          <th>Mood (1-5)</th>
+          <th>Self-Care?</th>
+          <th>Movement?</th>
+          <th>Screen Time?</th>
+          <th>Gratitude</th>
+          <th>Intentions</th>
+          <th>Wins Today</th>
+          <th>Notes</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      entries.forEach((row, idx) => {
+        const tr = document.createElement("tr");
+
+        const dateTd = document.createElement("td");
+        dateTd.appendChild(makeDateInput(row.date, v => { row.date = v; saveState(); }));
+        tr.appendChild(dateTd);
+
+        const sleepTd = document.createElement("td");
+        sleepTd.appendChild(makeNumberInput(row.sleep, "0.1", "0", v => { row.sleep = v; saveState(); }));
+        tr.appendChild(sleepTd);
+
+        const stressTd = document.createElement("td");
+        stressTd.appendChild(makeNumberInput(row.stress, "1", "1", v => { row.stress = v; saveState(); }));
+        tr.appendChild(stressTd);
+
+        const energyTd = document.createElement("td");
+        energyTd.appendChild(makeNumberInput(row.energy, "1", "1", v => { row.energy = v; saveState(); }));
+        tr.appendChild(energyTd);
+
+        const moodTd = document.createElement("td");
+        moodTd.appendChild(makeNumberInput(row.mood, "1", "1", v => { row.mood = v; saveState(); }));
+        tr.appendChild(moodTd);
+
+        const scTd = document.createElement("td");
+        scTd.appendChild(makeSelect(["", "Yes", "No"], row.selfCare, v => { row.selfCare = v; saveState(); }));
+        tr.appendChild(scTd);
+
+        const mvTd = document.createElement("td");
+        mvTd.appendChild(makeSelect(["", "Yes", "No"], row.movement, v => { row.movement = v; saveState(); }));
+        tr.appendChild(mvTd);
+
+        const stTd = document.createElement("td");
+        stTd.appendChild(makeSelect(["", "Yes", "No"], row.screenControl, v => { row.screenControl = v; saveState(); }));
+        tr.appendChild(stTd);
+
+        const gratTd = document.createElement("td");
+        gratTd.appendChild(makeTextInput(row.gratitude, "", v => { row.gratitude = v; saveState(); }));
+        tr.appendChild(gratTd);
+
+        const intentTd = document.createElement("td");
+        intentTd.appendChild(makeTextInput(row.intentions, "", v => { row.intentions = v; saveState(); }));
+        tr.appendChild(intentTd);
+
+        const winsTd = document.createElement("td");
+        winsTd.appendChild(makeTextInput(row.winsToday, "", v => { row.winsToday = v; saveState(); }));
+        tr.appendChild(winsTd);
+
+        const notesTd = document.createElement("td");
+        notesTd.appendChild(makeTextarea(row.notes, "", v => { row.notes = v; saveState(); }));
+        tr.appendChild(notesTd);
+
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (Personal_Tracker)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Date", "Sleep (hrs)", "Stress (1-5)", "Energy (1-5)", "Mood (1-5)",
+          "Self-Care Completed (Yes/No)", "Daily Movement (Yes/No)", "Screen Time Control (Yes/No)",
+          "Gratitude", "Intentions for Tomorrow", "Wins Today", "Notes"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.date || "",
+          r.sleep || "",
+          r.stress || "",
+          r.energy || "",
+          r.mood || "",
+          r.selfCare || "",
+          r.movement || "",
+          r.screenControl || "",
+          r.gratitude || "",
+          r.intentions || "",
+          r.winsToday || "",
+          r.notes || ""
+        ]);
+        exportCsv(headers, rows, "Personal_Tracker.csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Day";
+      addBtn.addEventListener("click", () => {
+        state.entries.push({
+          date: "",
+          sleep: "",
+          stress: "",
+          energy: "",
+          mood: "",
+          selfCare: "",
+          movement: "",
+          screenControl: "",
+          gratitude: "",
+          intentions: "",
+          winsToday: "",
+          notes: ""
+        });
+        saveState();
+        renderScreen();
+      });
+      controls.appendChild(addBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all personal tracker rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      // Analytics
+      const sleeps = (state.entries || []).map(r => toNumber(r.sleep));
+      const stressVals = (state.entries || []).map(r => toNumber(r.stress));
+      const moodVals = (state.entries || []).map(r => toNumber(r.mood));
+
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Avg Sleep (hrs)</div>
+          <div class="analytics-value">${sleeps.length ? avg(sleeps).toFixed(1) : "0.0"}</div>
         </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Avg Stress (1–5)</div>
+          <div class="analytics-value">${stressVals.length ? avg(stressVals).toFixed(1) : "0.0"}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Avg Mood (1–5)</div>
+          <div class="analytics-value">${moodVals.length ? avg(moodVals).toFixed(1) : "0.0"}</div>
+        </div>
+      `;
+      section.appendChild(analytics);
+
+      return section;
+    }
+
+    /* ---- HIGHLIGHTS_WINS ---- */
+    function renderHighlights() {
+      const tabId = "highlights";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
+      const section = document.createElement("section");
+      section.className = "card";
+
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <h2>Weekly Highlights & Wins</h2>
+          <span>From Highlights_Wins: one row per week.</span>
+        </div>
+        <div class="badge"><span>${entries.length}</span> weeks</div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Week Starting</th>
+          <th>Biggest Win</th>
+          <th>Health/Fitness Win</th>
+          <th>Disc Golf Win</th>
+          <th>YouTube Win</th>
+          <th>Vets DG Win</th>
+          <th>Guitar Win</th>
+          <th>Mindset Win</th>
+          <th>Notes</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      entries.forEach((row, idx) => {
+        const tr = document.createElement("tr");
+
+        const dateTd = document.createElement("td");
+        dateTd.appendChild(makeDateInput(row.weekStarting, v => { row.weekStarting = v; saveState(); }));
+        tr.appendChild(dateTd);
+
+        ["biggestWin","healthWin","dgWin","ytWin","vetsWin","guitarWin","mindsetWin"].forEach(key => {
+          const td = document.createElement("td");
+          td.appendChild(makeTextInput(row[key], "", v => { row[key] = v; saveState(); }));
+          tr.appendChild(td);
+        });
+
+        const notesTd = document.createElement("td");
+        notesTd.appendChild(makeTextarea(row.notes, "", v => { row.notes = v; saveState(); }));
+        tr.appendChild(notesTd);
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (Highlights_Wins)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Week Starting", "Biggest Win", "Health/Fitness Win", "Disc Golf Win",
+          "YouTube Win", "Vets DG Win", "Guitar Win", "Mindset Win", "Notes"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.weekStarting || "",
+          r.biggestWin || "",
+          r.healthWin || "",
+          r.dgWin || "",
+          r.ytWin || "",
+          r.vetsWin || "",
+          r.guitarWin || "",
+          r.mindsetWin || "",
+          r.notes || ""
+        ]);
+        exportCsv(headers, rows, "Highlights_Wins.csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Week";
+      addBtn.addEventListener("click", () => {
+        state.entries.push({
+          weekStarting: "",
+          biggestWin: "",
+          healthWin: "",
+          dgWin: "",
+          ytWin: "",
+          vetsWin: "",
+          guitarWin: "",
+          mindsetWin: "",
+          notes: ""
+        });
+        saveState();
+        renderScreen();
+      });
+      controls.appendChild(addBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all weekly highlights?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Weeks captured</div>
+          <div class="analytics-value">${entries.length}</div>
+        </div>
+      `;
+      section.appendChild(analytics);
+
+      return section;
+    }
+
+    /* ---- MONTH_VIEW ---- */
+    function renderMonthView() {
+      const tabId = "month_view";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
+      const section = document.createElement("section");
+      section.className = "card";
+
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <h2>Month View</h2>
+          <span>From Month_View tab: one row per month.</span>
+        </div>
+        <div class="badge"><span>${entries.length}</span> months</div>
       `;
       section.appendChild(header);
 
@@ -736,71 +1468,67 @@
       const thead = document.createElement("thead");
       thead.innerHTML = `
         <tr>
-          <th style="min-width:90px;">Date</th>
-          <th style="min-width:80px;">Distance (mi)</th>
-          <th style="min-width:80px;">Pack (lbs)</th>
-          <th style="min-width:120px;">Terrain / Notes</th>
+          <th>Month</th>
+          <th>Overall Grade</th>
+          <th>Weight Change (+/- lbs)</th>
+          <th>Steps / Miles Total</th>
+          <th>DG Sessions (#)</th>
+          <th>Putting Avg % (C1/C1X)</th>
+          <th>Fieldwork Sessions (#)</th>
+          <th>Tournament Results</th>
+          <th>Mammoth Distance Total (mi)</th>
+          <th>YT Uploads (#)</th>
+          <th>YT Avg CTR (%)</th>
+          <th>YT Subs Change</th>
+          <th>Vet DG Events (#)</th>
+          <th>Vet DG Membership Change</th>
+          <th>Guitar Practice Hours</th>
+          <th>Guitar BPM Progress (+/-)</th>
+          <th>Mental Health Avg (1–5)</th>
+          <th>Sleep Avg (hrs)</th>
+          <th>Stress Avg (1–5)</th>
+          <th>Rest Days (#)</th>
+          <th>Work/Life Balance (1–5)</th>
+          <th>Biggest Wins</th>
+          <th>Biggest Challenges</th>
+          <th>Lessons Learned</th>
+          <th>Adjustments Next Month</th>
+          <th>Notes / Reflection</th>
+          <th>Monthly Score (0–1)</th>
         </tr>
       `;
       table.appendChild(thead);
 
       const tbody = document.createElement("tbody");
-      (appState.mammoth.entries || []).forEach((entry, idx) => {
+      entries.forEach(row => {
         const tr = document.createElement("tr");
-
-        const dateTd = document.createElement("td");
-        const dateInput = document.createElement("input");
-        dateInput.type = "date";
-        dateInput.className = "log-input";
-        dateInput.value = entry.date || "";
-        dateInput.addEventListener("input", () => {
-          appState.mammoth.entries[idx].date = dateInput.value;
-          saveState(appState);
-        });
-        dateTd.appendChild(dateInput);
-        tr.appendChild(dateTd);
-
-        const distTd = document.createElement("td");
-        const distInput = document.createElement("input");
-        distInput.type = "number";
-        distInput.inputMode = "decimal";
-        distInput.step = "0.1";
-        distInput.min = "0";
-        distInput.className = "log-input";
-        distInput.value = entry.distance || "";
-        distInput.addEventListener("input", () => {
-          appState.mammoth.entries[idx].distance = distInput.value;
-          saveState(appState);
-        });
-        distTd.appendChild(distInput);
-        tr.appendChild(distTd);
-
-        const packTd = document.createElement("td");
-        const packInput = document.createElement("input");
-        packInput.type = "number";
-        packInput.inputMode = "decimal";
-        packInput.step = "0.5";
-        packInput.min = "0";
-        packInput.className = "log-input";
-        packInput.value = entry.packWeight || "";
-        packInput.addEventListener("input", () => {
-          appState.mammoth.entries[idx].packWeight = packInput.value;
-          saveState(appState);
-        });
-        packTd.appendChild(packInput);
-        tr.appendChild(packTd);
-
-        const notesTd = document.createElement("td");
-        const notesInput = document.createElement("textarea");
-        notesInput.className = "log-input";
-        notesInput.value = entry.notes || "";
-        notesInput.addEventListener("input", () => {
-          appState.mammoth.entries[idx].notes = notesInput.value;
-          saveState(appState);
-        });
-        notesTd.appendChild(notesInput);
-        tr.appendChild(notesTd);
-
+        tr.appendChild(makeCell(makeTextInput(row.month, "Jan 2026", v => { row.month = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.grade, "A/B/C", v => { row.grade = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.weightChange, "0.1", "-999", v => { row.weightChange = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.stepsMiles, "", v => { row.stepsMiles = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.dgSessions, "1", "0", v => { row.dgSessions = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.puttingAvg, "C1/C1X", v => { row.puttingAvg = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.fieldworkSessions, "1", "0", v => { row.fieldworkSessions = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.tournResults, "", v => { row.tournResults = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.mammothMiles, "0.1", "0", v => { row.mammothMiles = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.ytUploads, "1", "0", v => { row.ytUploads = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.ytCtr, "0.1", "0", v => { row.ytCtr = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.ytSubsChange, "1", "-999", v => { row.ytSubsChange = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.vetEvents, "1", "0", v => { row.vetEvents = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.vetMembersChange, "1", "-999", v => { row.vetMembersChange = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.guitarHours, "0.1", "0", v => { row.guitarHours = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.guitarBpmDelta, "1", "-999", v => { row.guitarBpmDelta = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.mentalAvg, "0.1", "0", v => { row.mentalAvg = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.sleepAvg, "0.1", "0", v => { row.sleepAvg = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.stressAvg, "0.1", "0", v => { row.stressAvg = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.restDays, "1", "0", v => { row.restDays = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.workLifeScore, "0.1", "0", v => { row.workLifeScore = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.bigWins, "", v => { row.bigWins = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.challenges, "", v => { row.challenges = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.lessons, "", v => { row.lessons = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.adjustments, "", v => { row.adjustments = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.notes, "", v => { row.notes = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.monthScore, "0.01", "0", v => { row.monthScore = v; saveState(); })));
         tbody.appendChild(tr);
       });
 
@@ -808,383 +1536,1451 @@
       tableWrapper.appendChild(table);
       section.appendChild(tableWrapper);
 
-      const rowControls = document.createElement("div");
-      rowControls.className = "row-controls";
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
 
-      const clearBtn = document.createElement("button");
-      clearBtn.type = "button";
-      clearBtn.className = "clear-btn";
-      clearBtn.textContent = "Clear all hikes";
-      clearBtn.addEventListener("click", () => {
-        if (confirm("Clear all Mammoth March entries?")) {
-          appState.mammoth.entries = [];
-          saveState(appState);
-          renderScreen("mammoth");
-        }
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (Month_View)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Month","Overall Grade","Weight Change (+/- lbs)","Steps / Miles Total","Disc Golf Sessions (#)",
+          "Putting Avg % (C1/C1X)","Fieldwork Sessions (#)","Tournament Results (text)","Mammoth Distance Total (mi)",
+          "YouTube Uploads (#)","YouTube Avg CTR (%)","YouTube Subs Change","Vet DG Events (#)","Vet DG Membership Change",
+          "Guitar Practice Hours","Guitar BPM Progress (+/-)","Mental Health Avg (1–5)","Sleep Avg (hrs)",
+          "Stress Avg (1–5)","Rest Days (#)","Work/Life Balance Score (1–5)","Biggest Wins","Biggest Challenges",
+          "Lessons Learned","Adjustments for Next Month","Notes / Reflection","Monthly Score (0–1)"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.month || "", r.grade || "", r.weightChange || "", r.stepsMiles || "", r.dgSessions || "",
+          r.puttingAvg || "", r.fieldworkSessions || "", r.tournResults || "", r.mammothMiles || "",
+          r.ytUploads || "", r.ytCtr || "", r.ytSubsChange || "", r.vetEvents || "", r.vetMembersChange || "",
+          r.guitarHours || "", r.guitarBpmDelta || "", r.mentalAvg || "", r.sleepAvg || "",
+          r.stressAvg || "", r.restDays || "", r.workLifeScore || "", r.bigWins || "", r.challenges || "",
+          r.lessons || "", r.adjustments || "", r.notes || "", r.monthScore || ""
+        ]);
+        exportCsv(headers, rows, "Month_View.csv");
       });
-
-      rowControls.appendChild(clearBtn);
-      section.appendChild(rowControls);
+      controls.appendChild(exportBtn);
 
       const addBtn = document.createElement("button");
       addBtn.type = "button";
-      addBtn.className = "add-btn";
-      addBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-        </svg>
-        Add hike
-      `;
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Month";
       addBtn.addEventListener("click", () => {
-        appState.mammoth.entries.push({
-          id: makeId(),
-          date: "",
-          distance: "",
-          packWeight: "",
-          notes: ""
-        });
-        saveState(appState);
-        renderScreen("mammoth");
+        state.entries.push({});
+        saveState();
+        renderScreen();
       });
-      section.appendChild(addBtn);
+      controls.appendChild(addBtn);
 
-      const helper = document.createElement("div");
-      helper.className = "helper-text";
-      helper.innerHTML = `
-        <div class="helper-dot"></div>
-        <div>
-          Use this like your Mammoth March tab: log each hike, distance, and pack weight.
-          Over time that green badge shows your total miles.
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all month rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      const monthScores = entries.map(r => toNumber(r.monthScore));
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Months tracked</div>
+          <div class="analytics-value">${entries.length}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Avg Monthly Score (0–1)</div>
+          <div class="analytics-value">${monthScores.length ? avg(monthScores).toFixed(2) : "0.00"}</div>
         </div>
       `;
-      section.appendChild(helper);
+      section.appendChild(analytics);
 
       return section;
     }
 
-    function renderDiscGolfScreen() {
+    function makeCell(child) {
+      const td = document.createElement("td");
+      td.appendChild(child);
+      return td;
+    }
+
+    /* ---- WEIGHT_FITNESS ---- */
+    function renderWeightFitness() {
+      const tabId = "weight_fitness";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
       const section = document.createElement("section");
       section.className = "card";
 
       const header = document.createElement("div");
       header.className = "card-header";
-
-      const totalRounds = (appState.discGolf.entries || []).length;
       header.innerHTML = `
         <div>
-          <h2>Disc Golf Log</h2>
-          <span>Track rounds, practice sessions, and notes.</span>
+          <h2>Weight & Fitness</h2>
+          <span>From Weight_Fitness: daily weight, steps, walks, workouts.</span>
         </div>
-        <div class="small-badge">
-          <span>${totalRounds}</span> entries
-        </div>
+        <div class="badge"><span>${entries.length}</span> days</div>
       `;
       section.appendChild(header);
 
       const tableWrapper = document.createElement("div");
       tableWrapper.className = "table-wrapper";
-
       const table = document.createElement("table");
       const thead = document.createElement("thead");
       thead.innerHTML = `
         <tr>
-          <th style="min-width:90px;">Date</th>
-          <th style="min-width:90px;">Type</th>
-          <th style="min-width:120px;">Course</th>
-          <th style="min-width:80px;">Score/Notes</th>
-          <th style="min-width:140px;">Focus / Notes</th>
+          <th>Date</th>
+          <th>Weight</th>
+          <th>Steps</th>
+          <th>Did You Walk</th>
+          <th>Miles</th>
+          <th>Did You Workout</th>
+          <th>Total Calories</th>
+          <th>Notes</th>
         </tr>
       `;
       table.appendChild(thead);
 
       const tbody = document.createElement("tbody");
-      (appState.discGolf.entries || []).forEach((entry, idx) => {
+      entries.forEach(row => {
         const tr = document.createElement("tr");
-
-        const dateTd = document.createElement("td");
-        const dateInput = document.createElement("input");
-        dateInput.type = "date";
-        dateInput.className = "log-input";
-        dateInput.value = entry.date || "";
-        dateInput.addEventListener("input", () => {
-          appState.discGolf.entries[idx].date = dateInput.value;
-          saveState(appState);
-        });
-        dateTd.appendChild(dateInput);
-        tr.appendChild(dateTd);
-
-        const typeTd = document.createElement("td");
-        const typeSelect = document.createElement("select");
-        typeSelect.className = "log-input";
-        ["Round", "Field Work", "Putting Practice", "Tournament"].forEach(opt => {
-          const o = document.createElement("option");
-          o.value = opt;
-          o.textContent = opt;
-          if ((entry.type || "") === opt) o.selected = true;
-          typeSelect.appendChild(o);
-        });
-        typeSelect.addEventListener("change", () => {
-          appState.discGolf.entries[idx].type = typeSelect.value;
-          saveState(appState);
-        });
-        typeTd.appendChild(typeSelect);
-        tr.appendChild(typeTd);
-
-        const courseTd = document.createElement("td");
-        const courseInput = document.createElement("input");
-        courseInput.type = "text";
-        courseInput.className = "log-input";
-        courseInput.placeholder = "Course / field";
-        courseInput.value = entry.course || "";
-        courseInput.addEventListener("input", () => {
-          appState.discGolf.entries[idx].course = courseInput.value;
-          saveState(appState);
-        });
-        courseTd.appendChild(courseInput);
-        tr.appendChild(courseTd);
-
-        const scoreTd = document.createElement("td");
-        const scoreInput = document.createElement("input");
-        scoreInput.type = "text";
-        scoreInput.className = "log-input";
-        scoreInput.placeholder = "+3 / 54 / C1: 12/15";
-        scoreInput.value = entry.score || "";
-        scoreInput.addEventListener("input", () => {
-          appState.discGolf.entries[idx].score = scoreInput.value;
-          saveState(appState);
-        });
-        scoreTd.appendChild(scoreInput);
-        tr.appendChild(scoreTd);
-
-        const notesTd = document.createElement("td");
-        const notesInput = document.createElement("textarea");
-        notesInput.className = "log-input";
-        notesInput.placeholder = "Wind, mindset, what to improve…";
-        notesInput.value = entry.notes || "";
-        notesInput.addEventListener("input", () => {
-          appState.discGolf.entries[idx].notes = notesInput.value;
-          saveState(appState);
-        });
-        notesTd.appendChild(notesInput);
-        tr.appendChild(notesTd);
-
+        tr.appendChild(makeCell(makeDateInput(row.date, v => { row.date = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.weight, "0.1", "0", v => { row.weight = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.steps, "1", "0", v => { row.steps = v; saveState(); })));
+        tr.appendChild(makeCell(makeSelect(["", "Yes", "No"], row.didWalk, v => { row.didWalk = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.miles, "0.1", "0", v => { row.miles = v; saveState(); })));
+        tr.appendChild(makeCell(makeSelect(["", "Yes", "No"], row.didWorkout, v => { row.didWorkout = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.calories, "1", "0", v => { row.calories = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.notes, "", v => { row.notes = v; saveState(); })));
         tbody.appendChild(tr);
       });
-
       table.appendChild(tbody);
       tableWrapper.appendChild(table);
       section.appendChild(tableWrapper);
 
-      const rowControls = document.createElement("div");
-      rowControls.className = "row-controls";
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
 
-      const clearBtn = document.createElement("button");
-      clearBtn.type = "button";
-      clearBtn.className = "clear-btn";
-      clearBtn.textContent = "Clear all entries";
-      clearBtn.addEventListener("click", () => {
-        if (confirm("Clear all disc golf entries?")) {
-          appState.discGolf.entries = [];
-          saveState(appState);
-          renderScreen("discGolf");
-        }
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (Weight_Fitness)";
+      exportBtn.addEventListener("click", () => {
+        const headers = ["Date","Weight","Steps","Did You Walk","Miles","Did You Workout","Total Calories","Notes"];
+        const rows = (state.entries || []).map(r => [
+          r.date || "", r.weight || "", r.steps || "", r.didWalk || "", r.miles || "",
+          r.didWorkout || "", r.calories || "", r.notes || ""
+        ]);
+        exportCsv(headers, rows, "Weight_Fitness.csv");
       });
-      rowControls.appendChild(clearBtn);
-      section.appendChild(rowControls);
+      controls.appendChild(exportBtn);
 
       const addBtn = document.createElement("button");
       addBtn.type = "button";
-      addBtn.className = "add-btn";
-      addBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-        </svg>
-        Add entry
-      `;
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Day";
       addBtn.addEventListener("click", () => {
-        appState.discGolf.entries.push({
-          id: makeId(),
-          date: "",
-          type: "Round",
-          course: "",
-          score: "",
-          notes: ""
-        });
-        saveState(appState);
-        renderScreen("discGolf");
+        state.entries.push({});
+        saveState();
+        renderScreen();
       });
-      section.appendChild(addBtn);
+      controls.appendChild(addBtn);
 
-      const helper = document.createElement("div");
-      helper.className = "helper-text";
-      helper.innerHTML = `
-        <div class="helper-dot"></div>
-        <div>
-          Use this like your disc golf tab: quick log of rounds and field work.
-          Capture course, score, and one key takeaway so you can see patterns over 2026.
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all weight/fitness rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const weights = entries.map(r => toNumber(r.weight));
+      const miles = entries.map(r => toNumber(r.miles));
+      const steps = entries.map(r => toNumber(r.steps));
+
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Avg Weight</div>
+          <div class="analytics-value">${weights.length ? avg(weights).toFixed(1) : "0.0"}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Total Miles</div>
+          <div class="analytics-value">${miles.length ? miles.reduce((a,b)=>a+b,0).toFixed(1) : "0.0"}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Avg Steps</div>
+          <div class="analytics-value">${steps.length ? Math.round(avg(steps)) : "0"}</div>
         </div>
       `;
-      section.appendChild(helper);
+      section.appendChild(analytics);
 
       return section;
     }
 
-    function renderYouTubeScreen() {
+    /* ---- MAMMOTH_TRACKER ---- */
+    function renderMammoth() {
+      const tabId = "mammoth";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
       const section = document.createElement("section");
       section.className = "card";
 
       const header = document.createElement("div");
       header.className = "card-header";
-      const totalIdeas = (appState.youtube.entries || []).length;
-      const uploadedCount = (appState.youtube.entries || []).filter(e => e.status === "Uploaded").length;
+      header.innerHTML = `
+        <div>
+          <h2>Mammoth March Tracker</h2>
+          <span>From Mammoth_Tracker: weekly long hike, miles, pack, conditions.</span>
+        </div>
+        <div class="badge"><span>${entries.length}</span> weeks</div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Week #</th>
+          <th>Long Hike Goal (mi)</th>
+          <th>Actual Long Distance (mi)</th>
+          <th>Goal Hit?</th>
+          <th>Total Miles (Week)</th>
+          <th>Pack Weight (lb)</th>
+          <th>Hydration</th>
+          <th>Fuel Tested</th>
+          <th>Terrain</th>
+          <th>Blisters (Y/N)</th>
+          <th>Gear Notes</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      entries.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.appendChild(makeCell(makeNumberInput(row.week, "1", "1", v => { row.week = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.goalLong, "0.1", "0", v => { row.goalLong = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.actualLong, "0.1", "0", v => { row.actualLong = v; saveState(); })));
+        tr.appendChild(makeCell(makeSelect(["","Yes","No"], row.goalHit, v => { row.goalHit = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.totalMilesWeek, "0.1", "0", v => { row.totalMilesWeek = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.packWeight, "0.5", "0", v => { row.packWeight = v; saveState(); })));
+        tr.appendChild(makeCell(makeSelect(["","Good","OK","Poor"], row.hydration, v => { row.hydration = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.fuelTested, "", v => { row.fuelTested = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.terrain, "", v => { row.terrain = v; saveState(); })));
+        tr.appendChild(makeCell(makeSelect(["","Y","N"], row.blisters, v => { row.blisters = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.gearNotes, "", v => { row.gearNotes = v; saveState(); })));
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (Mammoth_Tracker)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Week #","Long Hike Goal","Actual Long Day Distance","Goal Hit",
+          "Total Miles for the Week","Pack Weight (lb)","Hydration (Good/OK/Poor)",
+          "Fuel Tested","Terrain","Blisters (Y/N)","Gear Notes"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.week || "", r.goalLong || "", r.actualLong || "", r.goalHit || "",
+          r.totalMilesWeek || "", r.packWeight || "", r.hydration || "",
+          r.fuelTested || "", r.terrain || "", r.blisters || "", r.gearNotes || ""
+        ]);
+        exportCsv(headers, rows, "Mammoth_Tracker.csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Week";
+      addBtn.addEventListener("click", () => {
+        state.entries.push({});
+        saveState();
+        renderScreen();
+      });
+      controls.appendChild(addBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all Mammoth tracker rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const weeklyMiles = entries.map(r => toNumber(r.totalMilesWeek));
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Total Mammoth Miles</div>
+          <div class="analytics-value">${weeklyMiles.length ? weeklyMiles.reduce((a,b)=>a+b,0).toFixed(1) : "0.0"}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Weeks Logged</div>
+          <div class="analytics-value">${entries.length}</div>
+        </div>
+      `;
+      section.appendChild(analytics);
+
+      return section;
+    }
+
+    /* ---- DISC GOLF LOGS ---- */
+    function renderDGPractice() {
+      const tabId = "dg_practice";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
+      const section = document.createElement("section");
+      section.className = "card";
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <h2>DG Practice Log</h2>
+          <span>From DG Practice Log: field work, putting, reps.</span>
+        </div>
+        <div class="badge"><span>${entries.length}</span> sessions</div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Date</th>
+          <th>Duration (min)</th>
+          <th>Session Type</th>
+          <th>Focus Skill</th>
+          <th>Discs Used</th>
+          <th>C1 Att</th>
+          <th>C1 Made</th>
+          <th>C2 Att</th>
+          <th>C2 Made</th>
+          <th>FH Reps</th>
+          <th>BH Reps</th>
+          <th>Fieldwork Notes</th>
+          <th>Wind</th>
+          <th>Fatigue</th>
+          <th>Result</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      entries.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.appendChild(makeCell(makeDateInput(row.date, v => { row.date = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.duration, "1", "0", v => { row.duration = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.sessionType, "Putting/Fieldwork", v => { row.sessionType = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.focusSkill, "C1, FH, etc.", v => { row.focusSkill = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.discs, "", v => { row.discs = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.c1Att, "1", "0", v => { row.c1Att = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.c1Made, "1", "0", v => { row.c1Made = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.c2Att, "1", "0", v => { row.c2Att = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.c2Made, "1", "0", v => { row.c2Made = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.fhReps, "1", "0", v => { row.fhReps = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.bhReps, "1", "0", v => { row.bhReps = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.notes, "", v => { row.notes = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.wind, "", v => { row.wind = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.fatigue, "", v => { row.fatigue = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.result, "", v => { row.result = v; saveState(); })));
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (DG Practice Log)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Date","Duration (min)","Session Type","Focus Skill","Discs Used",
+          "C1 Attempts","C1 Made","C2 Attempts","C2 Made","Forehand Reps","Backhand Reps",
+          "Fieldwork Notes","Wind","Fatigue","Result"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.date || "", r.duration || "", r.sessionType || "", r.focusSkill || "",
+          r.discs || "", r.c1Att || "", r.c1Made || "", r.c2Att || "", r.c2Made || "",
+          r.fhReps || "", r.bhReps || "", r.notes || "", r.wind || "", r.fatigue || "", r.result || ""
+        ]);
+        exportCsv(headers, rows, "DG Practice Log.csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Practice";
+      addBtn.addEventListener("click", () => {
+        state.entries.push({});
+        saveState();
+        renderScreen();
+      });
+      controls.appendChild(addBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all DG practice rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const totalPractice = entries.map(r => toNumber(r.duration)).reduce((a,b)=>a+b,0);
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Total Practice Minutes</div>
+          <div class="analytics-value">${totalPractice.toFixed(0)}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Sessions Logged</div>
+          <div class="analytics-value">${entries.length}</div>
+        </div>
+      `;
+      section.appendChild(analytics);
+
+      return section;
+    }
+
+    function renderDGRound() {
+      const tabId = "dg_round";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
+      const section = document.createElement("section");
+      section.className = "card";
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <h2>DG Round Log</h2>
+          <span>From DG Round Log: course, layout, score, C1/C2 stats.</span>
+        </div>
+        <div class="badge"><span>${entries.length}</span> rounds</div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Date</th>
+          <th>Course</th>
+          <th>Layout</th>
+          <th>Total Holes</th>
+          <th>Par</th>
+          <th>Score</th>
+          <th>Diff to Par</th>
+          <th>C1% (0-33ft)</th>
+          <th>C1X % (6-33ft)</th>
+          <th>C2 %</th>
+          <th>Misses &lt;20ft</th>
+          <th>Penalties</th>
+          <th>OBs</th>
+          <th>Lost Discs</th>
+          <th>Wind</th>
+          <th>Notes</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      entries.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.appendChild(makeCell(makeDateInput(row.date, v => { row.date = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.course, "", v => { row.course = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.layout, "", v => { row.layout = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.totalHoles, "1", "1", v => { row.totalHoles = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.par, "1", "0", v => { row.par = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.score, "1", "-999", v => { row.score = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.diffToPar, "1", "-999", v => { row.diffToPar = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.c1Pct, "0.1", "0", v => { row.c1Pct = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.c1xPct, "0.1", "0", v => { row.c1xPct = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.c2Pct, "0.1", "0", v => { row.c2Pct = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.miss20, "1", "0", v => { row.miss20 = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.penalties, "1", "0", v => { row.penalties = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.obs, "1", "0", v => { row.obs = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.lostDiscs, "1", "0", v => { row.lostDiscs = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.wind, "", v => { row.wind = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.notes, "", v => { row.notes = v; saveState(); })));
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (DG Round Log)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Date","Course","Layout","Total Holes","Par","Score","Diff to Par",
+          "C1% (0-33ft)","C1X % 6-33ft","C2 %","Misses inside 20ft",
+          "Penalties","OBs","Lost Discs","Wind","Notes"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.date || "", r.course || "", r.layout || "", r.totalHoles || "", r.par || "",
+          r.score || "", r.diffToPar || "", r.c1Pct || "", r.c1xPct || "", r.c2Pct || "",
+          r.miss20 || "", r.penalties || "", r.obs || "", r.lostDiscs || "", r.wind || "", r.notes || ""
+        ]);
+        exportCsv(headers, rows, "DG Round Log.csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Round";
+      addBtn.addEventListener("click", () => {
+        state.entries.push({});
+        saveState();
+        renderScreen();
+      });
+      controls.appendChild(addBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all DG round rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const scores = entries.map(r => toNumber(r.score));
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Rounds Logged</div>
+          <div class="analytics-value">${entries.length}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Avg Score</div>
+          <div class="analytics-value">${scores.length ? avg(scores).toFixed(1) : "0.0"}</div>
+        </div>
+      `;
+      section.appendChild(analytics);
+
+      return section;
+    }
+
+    function renderDGTournament() {
+      const tabId = "dg_tournament";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
+      const section = document.createElement("section");
+      section.className = "card";
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <h2>DG Tournament Log</h2>
+          <span>From DG Tournament Log: events, divisions, placing, putting stats.</span>
+        </div>
+        <div class="badge"><span>${entries.length}</span> events</div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Date</th>
+          <th>Event</th>
+          <th>Course(s)</th>
+          <th>Division</th>
+          <th>Round Scores</th>
+          <th>Total Participants</th>
+          <th>Place</th>
+          <th>C1X %</th>
+          <th>C1 %</th>
+          <th>C2 %</th>
+          <th>Missed Inside 20ft</th>
+          <th>Notes</th>
+          <th>Takeaways</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      entries.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.appendChild(makeCell(makeDateInput(row.date, v => { row.date = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.event, "", v => { row.event = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.courses, "", v => { row.courses = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.division, "", v => { row.division = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.roundScores, "e.g. 57/54", v => { row.roundScores = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.totalPlayers, "1", "0", v => { row.totalPlayers = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.place, "e.g. 5/32", v => { row.place = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.c1x, "0.1", "0", v => { row.c1x = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.c1, "0.1", "0", v => { row.c1 = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.c2, "0.1", "0", v => { row.c2 = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.miss20, "1", "0", v => { row.miss20 = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.notes, "", v => { row.notes = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.takeaways, "", v => { row.takeaways = v; saveState(); })));
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (DG Tournament Log)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Date","Event","Course(s)","Division","Round Scores","Total Participants",
+          "Place","C1X %","C1 %","C2 %","Missed Inside 20ft","Notes","Takeaways"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.date || "", r.event || "", r.courses || "", r.division || "", r.roundScores || "",
+          r.totalPlayers || "", r.place || "", r.c1x || "", r.c1 || "", r.c2 || "",
+          r.miss20 || "", r.notes || "", r.takeaways || ""
+        ]);
+        exportCsv(headers, rows, "DG Tournament Log.csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Event";
+      addBtn.addEventListener("click", () => {
+        state.entries.push({});
+        saveState();
+        renderScreen();
+      });
+      controls.appendChild(addBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all DG tournament rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Events Logged</div>
+          <div class="analytics-value">${entries.length}</div>
+        </div>
+      `;
+      section.appendChild(analytics);
+
+      return section;
+    }
+
+    /* ---- VetsDG_Tracker ---- */
+    function renderVetsDG() {
+      const tabId = "vetsdg";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
+      const section = document.createElement("section");
+      section.className = "card";
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <h2>Vets DG Outreach</h2>
+          <span>From VetsDG_Tracker: events, sponsors, attendance, donations.</span>
+        </div>
+        <div class="badge"><span>${entries.length}</span> entries</div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Date</th>
+          <th>Entry Type</th>
+          <th>Event / Organization</th>
+          <th>Category</th>
+          <th>Sponsors</th>
+          <th>Outreach</th>
+          <th>Attendance</th>
+          <th>Donation</th>
+          <th>Contact Status</th>
+          <th>Notes</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      entries.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.appendChild(makeCell(makeDateInput(row.date, v => { row.date = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.entryType, "Event/Meeting", v => { row.entryType = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.eventName, "", v => { row.eventName = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.category, "", v => { row.category = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.sponsors, "", v => { row.sponsors = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.outreach, "", v => { row.outreach = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.attendance, "1", "0", v => { row.attendance = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.donation, "1", "0", v => { row.donation = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.contactStatus, "", v => { row.contactStatus = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.notes, "", v => { row.notes = v; saveState(); })));
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (VetsDG_Tracker)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Date","Entry Type","Event Name/Organization","Category","Sponsors",
+          "Outreach","Attendance","Donation","Contact Status","Notes"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.date || "", r.entryType || "", r.eventName || "", r.category || "",
+          r.sponsors || "", r.outreach || "", r.attendance || "", r.donation || "",
+          r.contactStatus || "", r.notes || ""
+        ]);
+        exportCsv(headers, rows, "VetsDG_Tracker.csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Entry";
+      addBtn.addEventListener("click", () => {
+        state.entries.push({});
+        saveState();
+        renderScreen();
+      });
+      controls.appendChild(addBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all Vets DG entries?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const donations = entries.map(r => toNumber(r.donation));
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Total Donation</div>
+          <div class="analytics-value">$${donations.length ? donations.reduce((a,b)=>a+b,0).toFixed(2) : "0.00"}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Total Attendance</div>
+          <div class="analytics-value">${entries.map(r => toNumber(r.attendance)).reduce((a,b)=>a+b,0)}</div>
+        </div>
+      `;
+      section.appendChild(analytics);
+
+      return section;
+    }
+
+    /* ---- YOUTUBE_TRACKER ---- */
+    function renderYouTubeTracker() {
+      const tabId = "yt_tracker";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
+      const section = document.createElement("section");
+      section.className = "card";
+      const header = document.createElement("div");
+      header.className = "card-header";
+
+      const uploadedCount = entries.filter(e => e.uploadDate).length;
       header.innerHTML = `
         <div>
           <h2>YouTube Tracker</h2>
-          <span>Keep BP Disc Golfing Dad ideas moving from idea to upload.</span>
+          <span>From YouTube_Tracker tab: planning + analytics per video. Subcategory uses Lists tab.</span>
         </div>
-        <div class="small-badge">
-          <span>${uploadedCount}</span> uploaded / ${totalIdeas} ideas
-        </div>
+        <div class="badge"><span>${uploadedCount}</span> with upload date / ${entries.length} rows</div>
       `;
       section.appendChild(header);
 
       const tableWrapper = document.createElement("div");
       tableWrapper.className = "table-wrapper";
-
       const table = document.createElement("table");
       const thead = document.createElement("thead");
       thead.innerHTML = `
         <tr>
-          <th style="min-width:140px;">Video Idea</th>
-          <th style="min-width:100px;">Status</th>
-          <th style="min-width:90px;">Target Date</th>
-          <th style="min-width:140px;">Notes</th>
+          <th>Week#</th>
+          <th>Title</th>
+          <th>Upload Date</th>
+          <th>Length</th>
+          <th>Video Type</th>
+          <th>Category</th>
+          <th>Subcategory</th>
+          <th>Hook</th>
+          <th>Thumbnail</th>
+          <th>Topic</th>
+          <th>CTR %</th>
+          <th>Avg View Duration</th>
+          <th>Avg View %</th>
+          <th>7 Day View</th>
+          <th>Total View</th>
+          <th>Sub Change</th>
+          <th>Video Score</th>
+          <th>Notes</th>
         </tr>
       `;
       table.appendChild(thead);
 
       const tbody = document.createElement("tbody");
-      (appState.youtube.entries || []).forEach((entry, idx) => {
+      entries.forEach(row => {
         const tr = document.createElement("tr");
-
-        const titleTd = document.createElement("td");
-        const titleInput = document.createElement("input");
-        titleInput.type = "text";
-        titleInput.className = "log-input";
-        titleInput.placeholder = "e.g., C1 Putting Drill for MA4s";
-        titleInput.value = entry.title || "";
-        titleInput.addEventListener("input", () => {
-          appState.youtube.entries[idx].title = titleInput.value;
-          saveState(appState);
-        });
-        titleTd.appendChild(titleInput);
-        tr.appendChild(titleTd);
-
-        const statusTd = document.createElement("td");
-        const statusSelect = document.createElement("select");
-        statusSelect.className = "log-input";
-        ["Idea", "Planning", "Filming", "Editing", "Uploaded"].forEach(opt => {
-          const o = document.createElement("option");
-          o.value = opt;
-          o.textContent = opt;
-          if ((entry.status || "Idea") === opt) o.selected = true;
-          statusSelect.appendChild(o);
-        });
-        statusSelect.addEventListener("change", () => {
-          appState.youtube.entries[idx].status = statusSelect.value;
-          saveState(appState);
-          renderScreen("youtube");
-        });
-        statusTd.appendChild(statusSelect);
-        tr.appendChild(statusTd);
-
-        const dateTd = document.createElement("td");
-        const dateInput = document.createElement("input");
-        dateInput.type = "date";
-        dateInput.className = "log-input";
-        dateInput.value = entry.targetDate || "";
-        dateInput.addEventListener("input", () => {
-          appState.youtube.entries[idx].targetDate = dateInput.value;
-          saveState(appState);
-        });
-        dateTd.appendChild(dateInput);
-        tr.appendChild(dateTd);
-
-        const notesTd = document.createElement("td");
-        const notesInput = document.createElement("textarea");
-        notesInput.className = "log-input";
-        notesInput.placeholder = "Hook, thumbnail idea, sponsor shout-outs…";
-        notesInput.value = entry.notes || "";
-        notesInput.addEventListener("input", () => {
-          appState.youtube.entries[idx].notes = notesInput.value;
-          saveState(appState);
-        });
-        notesTd.appendChild(notesInput);
-        tr.appendChild(notesTd);
-
+        tr.appendChild(makeCell(makeNumberInput(row.week, "1", "1", v => { row.week = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.title, "", v => { row.title = v; saveState(); })));
+        tr.appendChild(makeCell(makeDateInput(row.uploadDate, v => { row.uploadDate = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.length, "10:00", v => { row.length = v; saveState(); })));
+        tr.appendChild(makeCell(makeSelect(ytVideoTypeOptions, row.videoType, v => { row.videoType = v; saveState(); })));
+        tr.appendChild(makeCell(makeSelect(ytCategoryOptions, row.category, v => { row.category = v; saveState(); })));
+        tr.appendChild(makeCell(makeSelect(ytSubcategoryOptions, row.subcategory, v => { row.subcategory = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.hook, "", v => { row.hook = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.thumbnail, "", v => { row.thumbnail = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.topic, "", v => { row.topic = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.ctr, "0.1", "0", v => { row.ctr = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.avgViewDur, "0.1", "0", v => { row.avgViewDur = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.avgViewPct, "0.1", "0", v => { row.avgViewPct = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.view7, "1", "0", v => { row.view7 = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.totalView, "1", "0", v => { row.totalView = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.subChange, "1", "-999", v => { row.subChange = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.videoScore, "0.01", "0", v => { row.videoScore = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.notes, "", v => { row.notes = v; saveState(); })));
         tbody.appendChild(tr);
       });
-
       table.appendChild(tbody);
       tableWrapper.appendChild(table);
       section.appendChild(tableWrapper);
 
-      const rowControls = document.createElement("div");
-      rowControls.className = "row-controls";
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
 
-      const clearBtn = document.createElement("button");
-      clearBtn.type = "button";
-      clearBtn.className = "clear-btn";
-      clearBtn.textContent = "Clear all ideas";
-      clearBtn.addEventListener("click", () => {
-        if (confirm("Clear all YouTube ideas?")) {
-          appState.youtube.entries = [];
-          saveState(appState);
-          renderScreen("youtube");
-        }
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (YouTube_Tracker)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Week#","Title","Upload Date","Length","Video Type","Category","Subcategory","Hook","Thumbnail",
+          "Topic","CTR %","Average View Duration","Average View %","7 Day View","Total View","Sub Change",
+          "Video Score","Notes"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.week || "", r.title || "", r.uploadDate || "", r.length || "",
+          r.videoType || "", r.category || "", r.subcategory || "", r.hook || "",
+          r.thumbnail || "", r.topic || "", r.ctr || "", r.avgViewDur || "", r.avgViewPct || "",
+          r.view7 || "", r.totalView || "", r.subChange || "", r.videoScore || "", r.notes || ""
+        ]);
+        exportCsv(headers, rows, "YouTube_Tracker.csv");
       });
-      rowControls.appendChild(clearBtn);
-      section.appendChild(rowControls);
+      controls.appendChild(exportBtn);
 
       const addBtn = document.createElement("button");
       addBtn.type = "button";
-      addBtn.className = "add-btn";
-      addBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-        </svg>
-        Add idea
-      `;
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Video Row";
       addBtn.addEventListener("click", () => {
-        appState.youtube.entries.push({
-          id: makeId(),
-          title: "",
-          status: "Idea",
-          targetDate: "",
-          notes: ""
+        state.entries.push({
+          videoType: ytVideoTypeOptions[0],
+          category: ytCategoryOptions[0],
+          subcategory: ytSubcategoryOptions[0]
         });
-        saveState(appState);
-        renderScreen("youtube");
+        saveState();
+        renderScreen();
       });
-      section.appendChild(addBtn);
+      controls.appendChild(addBtn);
 
-      const helper = document.createElement("div");
-      helper.className = "helper-text";
-      helper.innerHTML = `
-        <div class="helper-dot"></div>
-        <div>
-          This mirrors your YouTube tab: one row per video, with status and target date.
-          Use it while you're out playing or between tasks so ideas never get lost.
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all YouTube tracker rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const ctrs = entries.map(r => toNumber(r.ctr));
+      const vidScores = entries.map(r => toNumber(r.videoScore));
+      const totalViews = entries.map(r => toNumber(r.totalView)).reduce((a,b)=>a+b,0);
+      const subs = entries.map(r => toNumber(r.subChange)).reduce((a,b)=>a+b,0);
+
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Avg CTR %</div>
+          <div class="analytics-value">${ctrs.length ? avg(ctrs).toFixed(1) : "0.0"}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Total Views</div>
+          <div class="analytics-value">${totalViews}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Total Sub Change</div>
+          <div class="analytics-value">${subs}</div>
+        </div>
+        <div class="analytics-card">
+          <div class="analytics-label">Avg Video Score</div>
+          <div class="analytics-value">${vidScores.length ? avg(vidScores).toFixed(2) : "0.00"}</div>
         </div>
       `;
-      section.appendChild(helper);
+      section.appendChild(analytics);
 
       return section;
     }
 
+    /* ---- Youtube Video Ideas ---- */
+    function renderYTIdeas() {
+      const tabId = "yt_ideas";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
+      const section = document.createElement("section");
+      section.className = "card";
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <h2>YouTube Video Ideas</h2>
+          <span>From Youtube Video Ideas tab: grouped idea buckets.</span>
+        </div>
+        <div class="badge"><span>${entries.length}</span> rows</div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Skill Tutorial</th>
+          <th>Gear Review</th>
+          <th>Course Gear</th>
+          <th>Lifestyle</th>
+          <th>Beginner Tips</th>
+          <th>Challenge</th>
+          <th>Experimentation</th>
+          <th>Quick Tip</th>
+          <th>20 Video Ideas</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      entries.forEach(row => {
+        const tr = document.createElement("tr");
+        ["skill","gear","courseGear","lifestyle","beginner","challenge","experimentation","quick","ideas"].forEach((key, idx) => {
+          const td = document.createElement("td");
+          td.appendChild(makeTextarea(row[key], "", v => { row[key] = v; saveState(); }));
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (Youtube Video Ideas)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Skill Tutorial","Gear Review","Course Gear","Lifestyle",
+          "Beginner Tips","Challenge","Experimentation","Quick Tip","20 Video Ideas"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.skill || "", r.gear || "", r.courseGear || "", r.lifestyle || "",
+          r.beginner || "", r.challenge || "", r.experimentation || "", r.quick || "", r.ideas || ""
+        ]);
+        exportCsv(headers, rows, "Youtube Video Ideas.csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Row";
+      addBtn.addEventListener("click", () => {
+        state.entries.push({});
+        saveState();
+        renderScreen();
+      });
+      controls.appendChild(addBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all idea rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Idea rows</div>
+          <div class="analytics-value">${entries.length}</div>
+        </div>
+      `;
+      section.appendChild(analytics);
+
+      return section;
+    }
+
+    /* ---- Script Templates (Long/Short) ---- */
+    function renderYTLongTemplate() {
+      return renderTemplateGeneric("yt_long_template", "Long Script Notes", "Long Script Template", "Example");
+    }
+    function renderYTShortTemplate() {
+      return renderTemplateGeneric("yt_short_template", "Short Script Notes", "Template", "Example of Template");
+    }
+
+    function renderTemplateGeneric(tabId, title, col1Name, col2Name) {
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
+      const section = document.createElement("section");
+      section.className = "card";
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <h2>${title}</h2>
+          <span>Use this to store your favorite script patterns and examples.</span>
+        </div>
+        <div class="badge"><span>${entries.length}</span> rows</div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>${col1Name}</th>
+          <th>${col2Name}</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      entries.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.appendChild(makeCell(makeTextarea(row.template, "", v => { row.template = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.example, "", v => { row.example = v; saveState(); })));
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV";
+      exportBtn.addEventListener("click", () => {
+        const headers = [col1Name, col2Name];
+        const rows = (state.entries || []).map(r => [r.template || "", r.example || ""]);
+        exportCsv(headers, rows, title.replace(/\s+/g,"_") + ".csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Row";
+      addBtn.addEventListener("click", () => {
+        state.entries.push({});
+        saveState();
+        renderScreen();
+      });
+      controls.appendChild(addBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      return section;
+    }
+
+    /* ---- GuitarPractice_Tracker ---- */
+    function renderGuitar() {
+      const tabId = "guitar";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
+      const section = document.createElement("section");
+      section.className = "card";
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <h2>Guitar Practice Tracker</h2>
+          <span>From GuitarPractice_Tracker: focus, BPM, difficulty, notes.</span>
+        </div>
+        <div class="badge"><span>${entries.length}</span> sessions</div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Date</th>
+          <th>Practice Length (mins)</th>
+          <th>Focus Area</th>
+          <th>Technique Skill</th>
+          <th>BPM Goal</th>
+          <th>BPM Achieved</th>
+          <th>BPM Success %</th>
+          <th>Song/Exercise</th>
+          <th>Difficulty (1-5)</th>
+          <th>Feeling</th>
+          <th>Notes</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      entries.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.appendChild(makeCell(makeDateInput(row.date, v => { row.date = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.length, "1", "0", v => { row.length = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.focus, "", v => { row.focus = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.technique, "", v => { row.technique = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.bpmGoal, "1", "0", v => { row.bpmGoal = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.bpmAchieved, "1", "0", v => { row.bpmAchieved = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.bpmSuccess, "0.1", "0", v => { row.bpmSuccess = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.song, "", v => { row.song = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.difficulty, "1", "1", v => { row.difficulty = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.feeling, "", v => { row.feeling = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.notes, "", v => { row.notes = v; saveState(); })));
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (GuitarPractice_Tracker)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Date","Practice Length (mins)","Focus Area","Technique Skill","BPM Goal",
+          "BPM Achieved","BPM Success %","Song/Exercise","Difficulty (1-5)","Feeling","Notes"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.date || "", r.length || "", r.focus || "", r.technique || "", r.bpmGoal || "",
+          r.bpmAchieved || "", r.bpmSuccess || "", r.song || "", r.difficulty || "", r.feeling || "", r.notes || ""
+        ]);
+        exportCsv(headers, rows, "GuitarPractice_Tracker.csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Session";
+      addBtn.addEventListener("click", () => {
+        state.entries.push({});
+        saveState();
+        renderScreen();
+      });
+      controls.appendChild(addBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all guitar rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const mins = entries.map(r => toNumber(r.length));
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Total Practice Minutes</div>
+          <div class="analytics-value">${mins.length ? mins.reduce((a,b)=>a+b,0) : 0}</div>
+        </div>
+      `;
+      section.appendChild(analytics);
+
+      return section;
+    }
+
+    /* ---- Certs_Tracker ---- */
+    function renderCerts() {
+      const tabId = "certs";
+      const state = appState[tabId];
+      const entries = state.entries || [];
+
+      const section = document.createElement("section");
+      section.className = "card";
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <h2>Certs Tracker</h2>
+          <span>From Certs_Tracker: CRISC/PMP domains, study time, scores.</span>
+        </div>
+        <div class="badge"><span>${entries.length}</span> sessions</div>
+      `;
+      section.appendChild(header);
+
+      const tableWrapper = document.createElement("div");
+      tableWrapper.className = "table-wrapper";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th>Date</th>
+          <th>Cert</th>
+          <th>Domain/Topic</th>
+          <th>Study Time (min)</th>
+          <th>Practice Qs %</th>
+          <th>Practice Exam Name</th>
+          <th>Score</th>
+          <th>Weak Areas</th>
+          <th>Notes</th>
+        </tr>
+      `;
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      entries.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.appendChild(makeCell(makeDateInput(row.date, v => { row.date = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.cert, "CRISC/PMP", v => { row.cert = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.domain, "", v => { row.domain = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.studyTime, "1", "0", v => { row.studyTime = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.practicePct, "0.1", "0", v => { row.practicePct = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextInput(row.examName, "", v => { row.examName = v; saveState(); })));
+        tr.appendChild(makeCell(makeNumberInput(row.score, "0.1", "0", v => { row.score = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.weakAreas, "", v => { row.weakAreas = v; saveState(); })));
+        tr.appendChild(makeCell(makeTextarea(row.notes, "", v => { row.notes = v; saveState(); })));
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+      section.appendChild(tableWrapper);
+
+      const controls = document.createElement("div");
+      controls.className = "controls-row";
+
+      const exportBtn = document.createElement("button");
+      exportBtn.type = "button";
+      exportBtn.className = "btn btn-primary";
+      exportBtn.textContent = "Export CSV (Certs_Tracker)";
+      exportBtn.addEventListener("click", () => {
+        const headers = [
+          "Date","Cert (CRISC/PMP)","Domain/Topic","Study Time (min)","Practice Qs %","Practice Exam Name","Score","Weak Areas","Notes"
+        ];
+        const rows = (state.entries || []).map(r => [
+          r.date || "", r.cert || "", r.domain || "", r.studyTime || "",
+          r.practicePct || "", r.examName || "", r.score || "", r.weakAreas || "", r.notes || ""
+        ]);
+        exportCsv(headers, rows, "Certs_Tracker.csv");
+      });
+      controls.appendChild(exportBtn);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn btn-primary";
+      addBtn.textContent = "Add Session";
+      addBtn.addEventListener("click", () => {
+        state.entries.push({});
+        saveState();
+        renderScreen();
+      });
+      controls.appendChild(addBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "btn btn-danger";
+      clearBtn.textContent = "Clear All";
+      clearBtn.addEventListener("click", () => {
+        if (confirm("Clear all cert rows?")) {
+          state.entries = [];
+          saveState();
+          renderScreen();
+        }
+      });
+      controls.appendChild(clearBtn);
+
+      section.appendChild(controls);
+
+      const studyMinutes = entries.map(r => toNumber(r.studyTime)).reduce((a,b)=>a+b,0);
+      const analytics = document.createElement("div");
+      analytics.className = "analytics-grid";
+      analytics.innerHTML = `
+        <div class="analytics-card">
+          <div class="analytics-label">Total Study Minutes</div>
+          <div class="analytics-value">${studyMinutes}</div>
+        </div>
+      `;
+      section.appendChild(analytics);
+
+      return section;
+    }
+
+    /* ---- INIT ---- */
     (function init() {
-      const active = appState.activeTab || "weekly";
-      setActiveTab(active);
+      renderGroupNav();
+      renderTabNav();
+      renderBottomNav();
+      renderScreen();
     })();
   </script>
 </body>
