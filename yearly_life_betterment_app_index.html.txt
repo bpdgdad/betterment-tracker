@@ -428,16 +428,24 @@
 </head>
 <body>
   <div class="app-shell">
-    <header>
-      <div class="title-block">
-        <h1>Yearly Life Betterment</h1>
-        <span>All your 2026 trackers in one phone app</span>
-      </div>
-      <div class="pill">
-        <div class="pill-dot"></div>
-        <span>Offline · Stored on this device</span>
-      </div>
-    </header>
+   <header>
+  <div class="title-block">
+    <h1>Yearly Life Betterment</h1>
+    <span>All your 2026 trackers in one phone app</span>
+  </div>
+
+  <div style="display:flex; gap:8px; align-items:center;">
+    <div class="pill">
+      <div class="pill-dot"></div>
+      <span>Offline · Stored on this device</span>
+    </div>
+
+    <!-- 🔹 NEW: one-click export for ALL CSVs -->
+    <button type="button" class="pill" onclick="exportAllCsv()">
+      <span>📤 Export all CSVs</span>
+    </button>
+  </div>
+</header>
 
     <main>
       <div class="group-strip" id="groupStrip"></div>
@@ -653,6 +661,7 @@
         lines.push(row.map(csvEscape).join(","));
       });
       const blob = new Blob([lines.join("
+
 ")], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -664,6 +673,261 @@
       URL.revokeObjectURL(url);
     }
 
+// 🔹 ONE CLICK: export CSVs for all sheets
+function exportAllCsv() {
+  if (!confirm("Export CSV files for ALL trackers? This will download one CSV per sheet.")) return;
+
+  // WEEK_TRACKER
+  {
+    const state = appState["week_tracker"];
+    const headers = ["Category", ...appConfig.weekly.days, "Weekly Summary"];
+    const rows = appConfig.weekly.rows.map(row => {
+      const rowData = [row.label];
+      appConfig.weekly.days.forEach(day => {
+        const val = (state.data[row.id] && state.data[row.id][day]) || "";
+        rowData.push(val);
+      });
+      rowData.push(row.summary || "");
+      return rowData;
+    });
+    exportCsv(headers, rows, "Week_Tracker.csv");
+  }
+
+  // PERSONAL_TRACKER
+  {
+    const state = appState["personal_tracker"];
+    const headers = [
+      "Date", "Sleep (hrs)", "Stress (1-5)", "Energy (1-5)", "Mood (1-5)",
+      "Self-Care Completed (Yes/No)", "Daily Movement (Yes/No)", "Screen Time Control (Yes/No)",
+      "Gratitude", "Intentions for Tomorrow", "Wins Today", "Notes"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.date || "",
+      r.sleep || "",
+      r.stress || "",
+      r.energy || "",
+      r.mood || "",
+      r.selfCare || "",
+      r.movement || "",
+      r.screenControl || "",
+      r.gratitude || "",
+      r.intentions || "",
+      r.winsToday || "",
+      r.notes || ""
+    ]);
+    exportCsv(headers, rows, "Personal_Tracker.csv");
+  }
+
+  // HIGHLIGHTS_WINS
+  {
+    const state = appState["highlights"];
+    const headers = [
+      "Week Starting", "Biggest Win", "Health/Fitness Win", "Disc Golf Win",
+      "YouTube Win", "Vets DG Win", "Guitar Win", "Mindset Win", "Notes"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.weekStarting || "",
+      r.biggestWin || "",
+      r.healthWin || "",
+      r.dgWin || "",
+      r.ytWin || "",
+      r.vetsWin || "",
+      r.guitarWin || "",
+      r.mindsetWin || "",
+      r.notes || ""
+    ]);
+    exportCsv(headers, rows, "Highlights_Wins.csv");
+  }
+
+  // MONTH_VIEW
+  {
+    const state = appState["month_view"];
+    const headers = [
+      "Month","Overall Grade","Weight Change (+/- lbs)","Steps / Miles Total","Disc Golf Sessions (#)",
+      "Putting Avg % (C1/C1X)","Fieldwork Sessions (#)","Tournament Results (text)","Mammoth Distance Total (mi)",
+      "YouTube Uploads (#)","YouTube Avg CTR (%)","YouTube Subs Change","Vet DG Events (#)","Vet DG Membership Change",
+      "Guitar Practice Hours","Guitar BPM Progress (+/-)","Mental Health Avg (1–5)","Sleep Avg (hrs)",
+      "Stress Avg (1–5)","Rest Days (#)","Work/Life Balance Score (1–5)","Biggest Wins","Biggest Challenges",
+      "Lessons Learned","Adjustments for Next Month","Notes / Reflection","Monthly Score (0–1)"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.month || "", r.grade || "", r.weightChange || "", r.stepsMiles || "", r.dgSessions || "",
+      r.puttingAvg || "", r.fieldworkSessions || "", r.tournResults || "", r.mammothMiles || "",
+      r.ytUploads || "", r.ytCtr || "", r.ytSubsChange || "", r.vetEvents || "", r.vetMembersChange || "",
+      r.guitarHours || "", r.guitarBpmDelta || "", r.mentalAvg || "", r.sleepAvg || "",
+      r.stressAvg || "", r.restDays || "", r.workLifeScore || "", r.bigWins || "", r.challenges || "",
+      r.lessons || "", r.adjustments || "", r.notes || "", r.monthScore || ""
+    ]);
+    exportCsv(headers, rows, "Month_View.csv");
+  }
+
+  // WEIGHT_FITNESS
+  {
+    const state = appState["weight_fitness"];
+    const headers = ["Date","Weight","Steps","Did You Walk","Miles","Did You Workout","Total Calories","Notes"];
+    const rows = (state.entries || []).map(r => [
+      r.date || "", r.weight || "", r.steps || "", r.didWalk || "", r.miles || "",
+      r.didWorkout || "", r.calories || "", r.notes || ""
+    ]);
+    exportCsv(headers, rows, "Weight_Fitness.csv");
+  }
+
+  // MAMMOTH_Tracker
+  {
+    const state = appState["mammoth"];
+    const headers = [
+      "Week #","Long Hike Goal","Actual Long Day Distance","Goal Hit",
+      "Total Miles for the Week","Pack Weight (lb)","Hydration (Good/OK/Poor)",
+      "Fuel Tested","Terrain","Blisters (Y/N)","Gear Notes"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.week || "", r.goalLong || "", r.actualLong || "", r.goalHit || "",
+      r.totalMilesWeek || "", r.packWeight || "", r.hydration || "",
+      r.fuelTested || "", r.terrain || "", r.blisters || "", r.gearNotes || ""
+    ]);
+    exportCsv(headers, rows, "Mammoth_Tracker.csv");
+  }
+
+  // DG PRACTICE LOG
+  {
+    const state = appState["dg_practice"];
+    const headers = [
+      "Date","Duration (min)","Session Type","Focus Skill","Discs Used",
+      "C1 Attempts","C1 Made","C2 Attempts","C2 Made","Forehand Reps","Backhand Reps",
+      "Fieldwork Notes","Wind","Fatigue","Result"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.date || "", r.duration || "", r.sessionType || "", r.focusSkill || "",
+      r.discs || "", r.c1Att || "", r.c1Made || "", r.c2Att || "", r.c2Made || "",
+      r.fhReps || "", r.bhReps || "", r.notes || "", r.wind || "", r.fatigue || "", r.result || ""
+    ]);
+    exportCsv(headers, rows, "DG Practice Log.csv");
+  }
+
+  // DG ROUND LOG
+  {
+    const state = appState["dg_round"];
+    const headers = [
+      "Date","Course","Layout","Total Holes","Par","Score","Diff to Par",
+      "C1% (0-33ft)","C1X % 6-33ft","C2 %","Misses inside 20ft",
+      "Penalties","OBs","Lost Discs","Wind","Notes"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.date || "", r.course || "", r.layout || "", r.totalHoles || "", r.par || "",
+      r.score || "", r.diffToPar || "", r.c1Pct || "", r.c1xPct || "", r.c2Pct || "",
+      r.miss20 || "", r.penalties || "", r.obs || "", r.lostDiscs || "", r.wind || "", r.notes || ""
+    ]);
+    exportCsv(headers, rows, "DG Round Log.csv");
+  }
+
+  // DG TOURNAMENT LOG
+  {
+    const state = appState["dg_tournament"];
+    const headers = [
+      "Date","Event","Course(s)","Division","Round Scores","Total Participants",
+      "Place","C1X %","C1 %","C2 %","Missed Inside 20ft","Notes","Takeaways"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.date || "", r.event || "", r.courses || "", r.division || "", r.roundScores || "",
+      r.totalPlayers || "", r.place || "", r.c1x || "", r.c1 || "", r.c2 || "",
+      r.miss20 || "", r.notes || "", r.takeaways || ""
+    ]);
+    exportCsv(headers, rows, "DG Tournament Log.csv");
+  }
+
+  // VetsDG_Tracker
+  {
+    const state = appState["vetsdg"];
+    const headers = [
+      "Date","Entry Type","Event Name/Organization","Category","Sponsors",
+      "Outreach","Attendance","Donation","Contact Status","Notes"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.date || "", r.entryType || "", r.eventName || "", r.category || "",
+      r.sponsors || "", r.outreach || "", r.attendance || "", r.donation || "",
+      r.contactStatus || "", r.notes || ""
+    ]);
+    exportCsv(headers, rows, "VetsDG_Tracker.csv");
+  }
+
+  // YouTube_Tracker
+  {
+    const state = appState["yt_tracker"];
+    const headers = [
+      "Week#","Title","Upload Date","Length","Video Type","Category","Subcategory","Hook","Thumbnail",
+      "Topic","CTR %","Average View Duration","Average View %","7 Day View","Total View","Sub Change",
+      "Video Score","Notes"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.week || "", r.title || "", r.uploadDate || "", r.length || "",
+      r.videoType || "", r.category || "", r.subcategory || "", r.hook || "",
+      r.thumbnail || "", r.topic || "", r.ctr || "", r.avgViewDur || "", r.avgViewPct || "",
+      r.view7 || "", r.totalView || "", r.subChange || "", r.videoScore || "", r.notes || ""
+    ]);
+    exportCsv(headers, rows, "YouTube_Tracker.csv");
+  }
+
+  // Youtube Video Ideas
+  {
+    const state = appState["yt_ideas"];
+    const headers = [
+      "Skill Tutorial","Gear Review","Course Gear","Lifestyle",
+      "Beginner Tips","Challenge","Experimentation","Quick Tip","20 Video Ideas"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.skill || "", r.gear || "", r.courseGear || "", r.lifestyle || "",
+      r.beginner || "", r.challenge || "", r.experimentation || "", r.quick || "", r.ideas || ""
+    ]);
+    exportCsv(headers, rows, "Youtube Video Ideas.csv");
+  }
+
+  // Long Script Template
+  {
+    const state = appState["yt_long_template"];
+    const headers = ["Long Script Template","Example"];
+    const rows = (state.entries || []).map(r => [
+      r.template || "", r.example || ""
+    ]);
+    exportCsv(headers, rows, "Long_Script_Template.csv");
+  }
+
+  // Short Script Template
+  {
+    const state = appState["yt_short_template"];
+    const headers = ["Template","Example of Template"];
+    const rows = (state.entries || []).map(r => [
+      r.template || "", r.example || ""
+    ]);
+    exportCsv(headers, rows, "Short_Script_Template.csv");
+  }
+
+  // GuitarPractice_Tracker
+  {
+    const state = appState["guitar"];
+    const headers = [
+      "Date","Practice Length (mins)","Focus Area","Technique Skill","BPM Goal",
+      "BPM Achieved","BPM Success %","Song/Exercise","Difficulty (1-5)","Feeling","Notes"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.date || "", r.length || "", r.focus || "", r.technique || "", r.bpmGoal || "",
+      r.bpmAchieved || "", r.bpmSuccess || "", r.song || "", r.difficulty || "", r.feeling || "", r.notes || ""
+    ]);
+    exportCsv(headers, rows, "GuitarPractice_Tracker.csv");
+  }
+
+  // Certs_Tracker
+  {
+    const state = appState["certs"];
+    const headers = [
+      "Date","Cert (CRISC/PMP)","Domain/Topic","Study Time (min)","Practice Qs %","Practice Exam Name","Score","Weak Areas","Notes"
+    ];
+    const rows = (state.entries || []).map(r => [
+      r.date || "", r.cert || "", r.domain || "", r.studyTime || "",
+      r.practicePct || "", r.examName || "", r.score || "", r.weakAreas || "", r.notes || ""
+    ]);
+    exportCsv(headers, rows, "Certs_Tracker.csv");
+  }
+}
     /* ---- NAV RENDERING ---- */
     function iconSvg(kind) {
       if (kind === "life") {
